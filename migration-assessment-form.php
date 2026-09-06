@@ -3,7 +3,7 @@
  * Plugin Name:       Migration Assessment Form
  * Plugin URI:        https://example.com/migration-assessment-form
  * Description:       افزونه اختصاصی فرم ارزیابی مهاجرت با پشتیبانی کامل از WPML، پنل مدیریت ورودی‌ها، لاگ تغییرات و خروجی CSV/PDF. فرانت و پنل ادمین کاملاً با Vanilla JS پیاده‌سازی شده‌اند.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Mojtaba Ghazi Nejad
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Core plugin constants.
  */
-define( 'MAF_VERSION', '1.0.0' );
+define( 'MAF_VERSION', '1.1.0' );
 define( 'MAF_DB_VERSION', '1.0.0' );
 define( 'MAF_PLUGIN_FILE', __FILE__ );
 define( 'MAF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );

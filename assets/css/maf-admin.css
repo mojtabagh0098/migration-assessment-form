@@ -79,3 +79,8 @@
 	width: 30%;
 	text-align: start;
 }
+
+.maf-muted { color: #8c8f94; }
+.maf-subtable { border-collapse: collapse; font-size: 12px; width: 100%; }
+.maf-subtable th, .maf-subtable td { border: 1px solid #e2e5e9; padding: 4px 6px; text-align: start; }
+.maf-subtable th { background: #f6f7f7; }

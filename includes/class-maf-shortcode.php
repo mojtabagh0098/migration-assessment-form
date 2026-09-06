@@ -52,6 +52,11 @@ class MAF_Shortcode {
 					'error'        => __( 'Something went wrong. Please try again.', 'migration-assessment-form' ),
 					'addRow'       => __( 'Add', 'migration-assessment-form' ),
 					'removeRow'    => __( 'Remove', 'migration-assessment-form' ),
+					'fileTooLarge' => __( 'File is too large (max %s MB).', 'migration-assessment-form' ),
+					'fileType'     => __( 'File type not allowed.', 'migration-assessment-form' ),
+					'tooManyFiles' => __( 'Too many files (max %s).', 'migration-assessment-form' ),
+					'invalidUrl'   => __( 'Please enter a valid URL.', 'migration-assessment-form' ),
+					'maxRows'      => __( 'Maximum number of rows reached.', 'migration-assessment-form' ),
 				),
 			)
 		);
@@ -77,10 +82,13 @@ class MAF_Shortcode {
 
 		ob_start();
 		?>
-		<form class="maf-form" id="maf-form-<?php echo esc_attr( $form_id ); ?>" data-form-id="<?php echo esc_attr( $form_id ); ?>" novalidate>
+		<form class="maf-form" id="maf-form-<?php echo esc_attr( $form_id ); ?>" data-form-id="<?php echo esc_attr( $form_id ); ?>" enctype="multipart/form-data" novalidate>
 			<?php foreach ( $schema as $section ) : ?>
 				<section class="maf-card" data-section="<?php echo esc_attr( $section['id'] ); ?>">
 					<h3 class="maf-card__title"><?php echo esc_html( $section['title'] ); ?></h3>
+					<?php if ( ! empty( $section['description'] ) ) : ?>
+						<p class="maf-card__desc"><?php echo esc_html( $section['description'] ); ?></p>
+					<?php endif; ?>
 					<div class="maf-card__body">
 						<?php if ( ! empty( $section['repeater'] ) ) : ?>
 							<?php $this->render_repeater( $section ); ?>
@@ -111,34 +119,69 @@ class MAF_Shortcode {
 	 * @param string $prefix Optional name prefix for repeater rows, e.g. "education[0]".
 	 */
 	private function render_field( $field, $prefix = '' ) {
-		$name       = $prefix ? $prefix . '[' . $field['key'] . ']' : $field['key'];
-		$field_id   = 'maf-field-' . sanitize_html_class( str_replace( array( '[', ']' ), '-', $name ) );
-		$required   = ! empty( $field['required'] );
-		$condition  = ! empty( $field['condition'] ) ? wp_json_encode( $field['condition'] ) : '';
-		$wrap_attrs = $condition ? ' data-condition=\'' . esc_attr( $condition ) . '\' hidden' : '';
+		$type        = $field['type'] ?? 'text';
+		$name        = $prefix ? $prefix . '[' . $field['key'] . ']' : $field['key'];
+		$field_id    = 'maf-field-' . sanitize_html_class( str_replace( array( '[', ']' ), '-', $name ) );
+		$required    = ! empty( $field['required'] );
+		$condition   = ! empty( $field['condition'] ) ? wp_json_encode( $field['condition'] ) : '';
+		$width       = isset( $field['width'] ) ? $field['width'] : 'full';
+		$placeholder = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
+		$wrap_attrs  = $condition ? ' data-condition=\'' . esc_attr( $condition ) . '\' hidden' : '';
+		$req_attr    = $required ? ' required' : '';
+		$ph_attr     = $placeholder ? ' placeholder="' . esc_attr( $placeholder ) . '"' : '';
+		$maxlen_attr = ! empty( $field['maxlength'] ) ? ' maxlength="' . (int) $field['maxlength'] . '"' : '';
 		?>
-		<div class="maf-field maf-field--<?php echo esc_attr( $field['type'] ); ?>"<?php echo $wrap_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- already escaped above. ?>>
+		<div class="maf-field maf-field--<?php echo esc_attr( $type ); ?> maf-field--w-<?php echo esc_attr( $width ); ?>" data-key="<?php echo esc_attr( $field['key'] ); ?>"<?php echo $wrap_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- already escaped above. ?>>
+			<?php if ( 'html' === $type ) : ?>
+				<div class="maf-html"><?php echo wp_kses_post( $field['content'] ?? '' ); ?></div>
+				<?php return; ?>
+			<?php endif; ?>
+
+			<?php if ( 'checkbox' !== $type ) : ?>
 			<label for="<?php echo esc_attr( $field_id ); ?>">
 				<?php echo esc_html( $field['label'] ); ?>
 				<?php if ( $required ) : ?><span class="maf-required" aria-hidden="true">*</span><?php endif; ?>
 			</label>
+			<?php endif; ?>
 
-			<?php switch ( $field['type'] ) :
+			<?php switch ( $type ) :
 				case 'textarea' : ?>
-					<textarea id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>" rows="3" <?php echo $required ? 'required' : ''; ?>></textarea>
+					<textarea id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>" rows="<?php echo (int) ( $field['rows'] ?? 3 ); ?>"<?php echo $req_attr . $ph_attr . $maxlen_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>></textarea>
 					<?php break;
 
 				case 'select' : ?>
-					<select id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>" <?php echo $required ? 'required' : ''; ?>>
-						<option value=""><?php esc_html_e( '— Select —', 'migration-assessment-form' ); ?></option>
-						<?php foreach ( $field['options'] as $value => $label ) : ?>
+					<select id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>"<?php echo $req_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+						<option value=""><?php echo $placeholder ? esc_html( $placeholder ) : esc_html__( '— Select —', 'migration-assessment-form' ); ?></option>
+						<?php foreach ( (array) ( $field['options'] ?? array() ) as $value => $label ) : ?>
 							<option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option>
 						<?php endforeach; ?>
 					</select>
 					<?php break;
 
+				case 'radio' :
+				case 'checkbox_group' :
+					$input_type = 'radio' === $type ? 'radio' : 'checkbox';
+					$group_name = 'radio' === $type ? $name : $name . '[]';
+					?>
+					<div class="maf-choices<?php echo ! empty( $field['inline'] ) ? ' maf-choices--inline' : ''; ?>" role="group" aria-labelledby="<?php echo esc_attr( $field_id ); ?>" id="<?php echo esc_attr( $field_id ); ?>" data-group-required="<?php echo $required ? '1' : '0'; ?>">
+						<?php foreach ( (array) ( $field['options'] ?? array() ) as $value => $label ) : ?>
+							<label class="maf-choice">
+								<input type="<?php echo esc_attr( $input_type ); ?>" name="<?php echo esc_attr( $group_name ); ?>" value="<?php echo esc_attr( $value ); ?>" />
+								<span><?php echo esc_html( $label ); ?></span>
+							</label>
+						<?php endforeach; ?>
+					</div>
+					<?php break;
+
+				case 'checkbox' : ?>
+					<label class="maf-choice maf-choice--single" for="<?php echo esc_attr( $field_id ); ?>">
+						<input type="checkbox" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>" value="1"<?php echo $req_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> />
+						<span><?php echo esc_html( $field['checkbox_label'] ?? $field['label'] ); ?><?php if ( $required ) : ?> <span class="maf-required" aria-hidden="true">*</span><?php endif; ?></span>
+					</label>
+					<?php break;
+
 				case 'country' : ?>
-					<select id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>" class="maf-country-select" <?php echo $required ? 'required' : ''; ?>>
+					<select id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>" class="maf-country-select"<?php echo $req_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 						<option value=""><?php esc_html_e( '— Select country —', 'migration-assessment-form' ); ?></option>
 						<?php foreach ( MAF_Fields_Countries::list() as $code => $label ) : ?>
 							<option value="<?php echo esc_attr( $code ); ?>"><?php echo esc_html( $label ); ?></option>
@@ -147,24 +190,46 @@ class MAF_Shortcode {
 					<?php break;
 
 				case 'tel_intl' : ?>
-					<input type="tel" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>" class="maf-tel-input" <?php echo $required ? 'required' : ''; ?> />
+					<input type="tel" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>" class="maf-tel-input"<?php echo $req_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> />
 					<?php break;
 
-				case 'number' : ?>
-					<input type="number" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>"
+				case 'number' :
+				case 'date' : ?>
+					<input type="<?php echo esc_attr( $type ); ?>" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>"
 						<?php echo isset( $field['min'] ) ? 'min="' . esc_attr( $field['min'] ) . '"' : ''; ?>
 						<?php echo isset( $field['max'] ) ? 'max="' . esc_attr( $field['max'] ) . '"' : ''; ?>
-						<?php echo $required ? 'required' : ''; ?> />
+						<?php echo isset( $field['step'] ) ? 'step="' . esc_attr( $field['step'] ) . '"' : ''; ?>
+						<?php echo $req_attr . $ph_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> />
 					<?php break;
 
-				case 'email' : ?>
-					<input type="email" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>" <?php echo $required ? 'required' : ''; ?> />
+				case 'file' :
+					$accept   = (array) ( $field['accept'] ?? MAF_Fields::default_file_settings()['accept'] );
+					$multiple = ! empty( $field['multiple'] );
+					?>
+					<div class="maf-upload" data-max-size="<?php echo (int) ( $field['max_size'] ?? 5 ); ?>" data-max-files="<?php echo (int) ( $field['max_files'] ?? 1 ); ?>" data-accept="<?php echo esc_attr( implode( ',', $accept ) ); ?>">
+						<input type="file" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>"
+							accept="<?php echo esc_attr( '.' . implode( ',.', $accept ) ); ?>"<?php echo $multiple ? ' multiple' : ''; ?><?php echo $req_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> />
+						<div class="maf-upload__zone">
+							<span class="maf-upload__icon" aria-hidden="true">⬆</span>
+							<span class="maf-upload__text"><?php esc_html_e( 'Drag & drop or click to choose a file', 'migration-assessment-form' ); ?></span>
+							<small class="maf-upload__hint"><?php echo esc_html( strtoupper( implode( ', ', $accept ) ) ); ?> · <?php echo esc_html( sprintf( __( 'max %d MB', 'migration-assessment-form' ), (int) ( $field['max_size'] ?? 5 ) ) ); ?></small>
+						</div>
+						<ul class="maf-upload__list"></ul>
+					</div>
+					<?php break;
+
+				case 'email' :
+				case 'url' : ?>
+					<input type="<?php echo esc_attr( $type ); ?>" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>"<?php echo $req_attr . $ph_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> />
 					<?php break;
 
 				default : ?>
-					<input type="text" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>" <?php echo $required ? 'required' : ''; ?> />
+					<input type="text" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $name ); ?>"<?php echo $req_attr . $ph_attr . $maxlen_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> />
 					<?php break;
 			endswitch; ?>
+			<?php if ( ! empty( $field['help'] ) ) : ?>
+				<small class="maf-field__help"><?php echo esc_html( $field['help'] ); ?></small>
+			<?php endif; ?>
 			<span class="maf-field__error" role="alert"></span>
 		</div>
 		<?php
@@ -178,7 +243,7 @@ class MAF_Shortcode {
 	 */
 	private function render_repeater( $section ) {
 		?>
-		<div class="maf-repeater" data-repeater="<?php echo esc_attr( $section['id'] ); ?>">
+		<div class="maf-repeater" data-repeater="<?php echo esc_attr( $section['id'] ); ?>" data-min-rows="<?php echo (int) ( $section['min_rows'] ?? 1 ); ?>" data-max-rows="<?php echo (int) ( $section['max_rows'] ?? 0 ); ?>">
 			<div class="maf-repeater__rows"></div>
 
 			<template class="maf-repeater__template">
