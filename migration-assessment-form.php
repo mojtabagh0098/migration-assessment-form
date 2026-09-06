@@ -6,7 +6,7 @@
  * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
- * Author:            Your Company
+ * Author:            Mojtaba Ghazi Nejad
  * Text Domain:       migration-assessment-form
  * Domain Path:       /languages
  *
