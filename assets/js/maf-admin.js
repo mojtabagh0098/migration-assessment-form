@@ -224,11 +224,7 @@
 		var body = document.getElementById( 'maf-modal-body' );
 
 		var dataRows = Object.keys( entry.data || {} ).map( function ( key ) {
-			var val = entry.data[ key ];
-			if ( typeof val === 'object' && val !== null ) {
-				val = JSON.stringify( val );
-			}
-			return '<tr><th>' + escapeHtml( key ) + '</th><td>' + escapeHtml( val ) + '</td></tr>';
+			return '<tr><th>' + escapeHtml( key ) + '</th><td>' + formatValue( entry.data[ key ] ) + '</td></tr>';
 		} ).join( '' );
 
 		var auditRows = ( entry.audit || [] ).map( function ( a ) {
@@ -286,6 +282,46 @@
 			.catch( function () {
 				statusEl.textContent = MAF_ADMIN_CONFIG.i18n.error;
 			} );
+	}
+
+	/**
+	 * Formats a submitted value for the detail modal: uploaded files become
+	 * links, repeater rows become a nested table, arrays become lists.
+	 * @param {*} val
+	 * @return {string}
+	 */
+	function formatValue( val ) {
+		if ( val === null || typeof val === 'undefined' || val === '' ) {
+			return '<span class="maf-muted">—</span>';
+		}
+		if ( Array.isArray( val ) ) {
+			if ( ! val.length ) {
+				return '<span class="maf-muted">—</span>';
+			}
+			if ( typeof val[0] === 'object' && val[0] !== null && val[0].url && val[0].path ) {
+				return val.map( fileLink ).join( '<br>' );
+			}
+			if ( typeof val[0] === 'object' && val[0] !== null ) {
+				var cols = Object.keys( val[0] );
+				return '<table class="maf-subtable"><thead><tr>' + cols.map( function ( c ) { return '<th>' + escapeHtml( c ) + '</th>'; } ).join( '' ) + '</tr></thead><tbody>' +
+					val.map( function ( row ) {
+						return '<tr>' + cols.map( function ( c ) { return '<td>' + formatValue( row[ c ] ) + '</td>'; } ).join( '' ) + '</tr>';
+					} ).join( '' ) + '</tbody></table>';
+			}
+			return escapeHtml( val.join( ', ' ) );
+		}
+		if ( typeof val === 'object' ) {
+			if ( val.url && val.path ) {
+				return fileLink( val );
+			}
+			return escapeHtml( JSON.stringify( val ) );
+		}
+		return escapeHtml( val );
+	}
+
+	function fileLink( f ) {
+		var kb = f.size ? ' <span class="maf-muted">(' + Math.round( f.size / 1024 ) + ' KB)</span>' : '';
+		return '<a href="' + escapeHtml( f.url ) + '" target="_blank" rel="noopener">' + escapeHtml( f.name || f.path ) + '</a>' + kb;
 	}
 
 	/**

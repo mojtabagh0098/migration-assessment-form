@@ -3,7 +3,7 @@ Contributors: yourcompany
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 
 Custom WordPress plugin: a multilingual (WPML-native) Immigration Assessment
@@ -19,8 +19,10 @@ Translation → enable "Assessment Forms"). No client-side language switcher
 is used anywhere — this matches the requirement precisely.
 
 Each `maf_form` post stores its field schema as JSON in post meta
-(`_maf_form_schema`), editable in the "Form Fields (Schema)" meta box on the
-post edit screen. New forms are seeded from `MAF_Fields::default_schema()`,
+(`_maf_form_schema`), edited through the **visual Form Builder** on the post
+edit screen (see below). The raw JSON remains accessible in the builder's
+"JSON" tab for power users; every save is deep-sanitized server-side
+(`MAF_Fields::sanitize_schema()`). New forms are seeded from `MAF_Fields::default_schema()`,
 which encodes every section/field requested (Contact Info, Personal Info
 incl. spouse conditional fields, Family/Friend in Canada, Language Skills,
 Education & Training repeater, Work Experience, Canadian Job Offer, Express
@@ -39,6 +41,39 @@ filtering; the complete submission is additionally stored as JSON in a
 row per changed field: admin id/name, field name, old value, new value,
 optional note, timestamp. Written automatically whenever an admin changes
 an entry's status or a hot field via the REST API.
+
+== Form Builder ==
+
+The "Form Builder" meta box (Assessment Forms → Add New / Edit) is a
+three-pane, Vanilla-JS drag & drop editor (no build step, no framework):
+
+- **Palette** (left) — click or drag a field type into any section. Types:
+  Text, Paragraph, Email, Phone (intl), Number, Date, URL, Dropdown, Radio,
+  Checkboxes, Single checkbox/consent, Country, **File upload**, Content block.
+  Also "Add section" / "Add repeater section".
+- **Canvas** (middle) — sections and fields as cards. Drag handles reorder
+  sections, reorder fields within a section, or move fields across
+  sections. Widths (full / half / third) are reflected in the grid.
+  Duplicate / delete / collapse per section; keyboard: Ctrl+Z / Ctrl+Shift+Z
+  undo-redo, Delete removes the selection.
+- **Inspector** (right) — settings for the selected section or field: label,
+  key, placeholder, help text, required, width, min/max/step, max length,
+  options editor (with drag-reorder and bulk "one per line" mode), file
+  rules (allowed extensions, max size, multiple + max count), and
+  conditional logic (show when field equals / not equals / contains / is
+  empty / is not empty).
+- **Repeater sections** — toggle any section to "Repeatable"; set the
+  add-row button label and min/max rows. Field keys inside a repeater are
+  scoped to that section.
+- **Preview** tab renders an approximation of the front-end form; **JSON**
+  tab exposes the raw schema (Apply / Copy).
+
+File uploads are sent as multipart along with the JSON payload, validated
+server-side (extension whitelist minus a hard-coded executable denylist,
+size, count, real MIME sniffing via `wp_check_filetype_and_ext()`), and
+stored under `uploads/maf-uploads/YYYY/MM/` behind an index.php/.htaccess
+guard. Entries store a descriptor (`name`, `size`, `type`, `url`, `path`)
+which the Entries modal renders as download links.
 
 == Admin Dashboard ==
 

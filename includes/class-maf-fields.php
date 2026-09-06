@@ -26,7 +26,7 @@ class MAF_Fields {
 	 * @return array
 	 */
 	public static function default_schema() {
-		return array(
+		$schema = array(
 			array(
 				'id'     => 'contact',
 				'title'  => __( 'Your Contact Info', 'migration-assessment-form' ),
@@ -302,7 +302,43 @@ class MAF_Fields {
 					),
 				),
 			),
+			array(
+				'id'     => 'documents',
+				'title'  => __( 'Supporting Documents', 'migration-assessment-form' ),
+				'fields' => array(
+					array(
+						'key'       => 'resume',
+						'type'      => 'file',
+						'label'     => __( 'Resume / CV', 'migration-assessment-form' ),
+						'accept'    => array( 'pdf', 'doc', 'docx' ),
+						'max_size'  => 5,
+						'multiple'  => false,
+						'max_files' => 1,
+					),
+					array(
+						'key'       => 'language_certificates',
+						'type'      => 'file',
+						'label'     => __( 'Language Test Certificates', 'migration-assessment-form' ),
+						'accept'    => array( 'pdf', 'jpg', 'jpeg', 'png' ),
+						'max_size'  => 5,
+						'multiple'  => true,
+						'max_files' => 3,
+					),
+				),
+			),
 		);
+
+		// Two-column layout by default for short inputs; long inputs stay full width.
+		foreach ( $schema as &$section ) {
+			foreach ( $section['fields'] as &$field ) {
+				if ( ! in_array( $field['type'], array( 'textarea', 'file', 'html' ), true ) ) {
+					$field['width'] = 'half';
+				}
+			}
+		}
+		unset( $section, $field );
+
+		return $schema;
 	}
 
 	/**
@@ -326,6 +362,325 @@ class MAF_Fields {
 			'SK' => 'Saskatchewan',
 			'YT' => 'Yukon',
 		);
+	}
+
+	/**
+	 * Registry of supported field types. Shared with the visual builder
+	 * (admin) so the palette, inspector and server-side sanitizer never drift.
+	 *
+	 * `supports` lists which inspector settings apply to a type.
+	 *
+	 * @return array
+	 */
+	public static function field_types() {
+		return array(
+			'text'           => array(
+				'label'    => __( 'Text', 'migration-assessment-form' ),
+				'icon'     => 'editor-textcolor',
+				'supports' => array( 'placeholder', 'required', 'maxlength' ),
+			),
+			'textarea'       => array(
+				'label'    => __( 'Paragraph', 'migration-assessment-form' ),
+				'icon'     => 'editor-paragraph',
+				'supports' => array( 'placeholder', 'required', 'maxlength', 'rows' ),
+			),
+			'email'          => array(
+				'label'    => __( 'Email', 'migration-assessment-form' ),
+				'icon'     => 'email',
+				'supports' => array( 'placeholder', 'required' ),
+			),
+			'tel_intl'       => array(
+				'label'    => __( 'Phone (international)', 'migration-assessment-form' ),
+				'icon'     => 'phone',
+				'supports' => array( 'required' ),
+			),
+			'number'         => array(
+				'label'    => __( 'Number', 'migration-assessment-form' ),
+				'icon'     => 'calculator',
+				'supports' => array( 'placeholder', 'required', 'min', 'max', 'step' ),
+			),
+			'date'           => array(
+				'label'    => __( 'Date', 'migration-assessment-form' ),
+				'icon'     => 'calendar-alt',
+				'supports' => array( 'required', 'min', 'max' ),
+			),
+			'url'            => array(
+				'label'    => __( 'Website / URL', 'migration-assessment-form' ),
+				'icon'     => 'admin-links',
+				'supports' => array( 'placeholder', 'required' ),
+			),
+			'select'         => array(
+				'label'    => __( 'Dropdown', 'migration-assessment-form' ),
+				'icon'     => 'menu-alt',
+				'supports' => array( 'required', 'options' ),
+			),
+			'radio'          => array(
+				'label'    => __( 'Radio buttons', 'migration-assessment-form' ),
+				'icon'     => 'marker',
+				'supports' => array( 'required', 'options', 'inline' ),
+			),
+			'checkbox_group' => array(
+				'label'    => __( 'Checkboxes', 'migration-assessment-form' ),
+				'icon'     => 'yes-alt',
+				'supports' => array( 'required', 'options', 'inline' ),
+			),
+			'checkbox'       => array(
+				'label'    => __( 'Single checkbox / consent', 'migration-assessment-form' ),
+				'icon'     => 'saved',
+				'supports' => array( 'required', 'checkbox_label' ),
+			),
+			'country'        => array(
+				'label'    => __( 'Country', 'migration-assessment-form' ),
+				'icon'     => 'admin-site-alt3',
+				'supports' => array( 'required' ),
+			),
+			'file'           => array(
+				'label'    => __( 'File upload', 'migration-assessment-form' ),
+				'icon'     => 'upload',
+				'supports' => array( 'required', 'file' ),
+			),
+			'html'           => array(
+				'label'    => __( 'Content block', 'migration-assessment-form' ),
+				'icon'     => 'text-page',
+				'supports' => array( 'content' ),
+				'static'   => true,
+			),
+		);
+	}
+
+	/**
+	 * Field types that carry no submitted value (purely presentational).
+	 *
+	 * @return array
+	 */
+	public static function static_types() {
+		$static = array();
+		foreach ( self::field_types() as $type => $def ) {
+			if ( ! empty( $def['static'] ) ) {
+				$static[] = $type;
+			}
+		}
+		return $static;
+	}
+
+	/**
+	 * Default upload constraints for `file` fields.
+	 *
+	 * @return array
+	 */
+	public static function default_file_settings() {
+		return array(
+			'accept'   => array( 'pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx' ),
+			'max_size' => 5,   // MB.
+			'multiple' => false,
+			'max_files' => 3,
+		);
+	}
+
+	/**
+	 * Extensions that may never be whitelisted for upload, regardless of
+	 * what the builder sends.
+	 *
+	 * @return array
+	 */
+	public static function blocked_extensions() {
+		return array( 'php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar', 'pht', 'exe', 'bat', 'cmd', 'com', 'sh', 'bash', 'cgi', 'pl', 'py', 'rb', 'js', 'jar', 'msi', 'dll', 'scr', 'vbs', 'ps1', 'htaccess', 'htm', 'html', 'svg', 'swf' );
+	}
+
+	/**
+	 * Deep-sanitizes a decoded schema coming from the builder (or the raw
+	 * JSON tab). Unknown keys are dropped, keys are normalised, duplicate
+	 * keys are made unique, and option/condition structures are validated.
+	 *
+	 * @param array $schema Decoded schema.
+	 * @return array
+	 */
+	public static function sanitize_schema( $schema ) {
+		$types      = self::field_types();
+		$clean      = array();
+		$used_keys  = array();
+		$used_ids   = array();
+		$section_no = 0;
+
+		foreach ( (array) $schema as $section ) {
+			if ( ! is_array( $section ) ) {
+				continue;
+			}
+			$section_no++;
+
+			$id = isset( $section['id'] ) ? sanitize_key( $section['id'] ) : '';
+			if ( '' === $id ) {
+				$id = 'section_' . $section_no;
+			}
+			$base = $id;
+			$n    = 2;
+			while ( isset( $used_ids[ $id ] ) ) {
+				$id = $base . '_' . $n++;
+			}
+			$used_ids[ $id ] = true;
+
+			$clean_section = array(
+				'id'          => $id,
+				'title'       => isset( $section['title'] ) ? sanitize_text_field( $section['title'] ) : '',
+				'description' => isset( $section['description'] ) ? sanitize_textarea_field( $section['description'] ) : '',
+				'fields'      => array(),
+			);
+
+			if ( ! empty( $section['repeater'] ) ) {
+				$clean_section['repeater']  = true;
+				$clean_section['row_label'] = isset( $section['row_label'] ) ? sanitize_text_field( $section['row_label'] ) : '';
+				$clean_section['min_rows']  = isset( $section['min_rows'] ) ? max( 0, (int) $section['min_rows'] ) : 0;
+				$clean_section['max_rows']  = isset( $section['max_rows'] ) ? max( 0, (int) $section['max_rows'] ) : 0;
+				// Repeater field keys are scoped to the section.
+				$scope_keys = array();
+			} else {
+				$scope_keys = &$used_keys;
+			}
+
+			$field_no = 0;
+			foreach ( (array) ( $section['fields'] ?? array() ) as $field ) {
+				if ( ! is_array( $field ) ) {
+					continue;
+				}
+				$field_no++;
+
+				$type = isset( $field['type'] ) && isset( $types[ $field['type'] ] ) ? $field['type'] : 'text';
+				$key  = isset( $field['key'] ) ? sanitize_key( $field['key'] ) : '';
+				if ( '' === $key ) {
+					$key = $type . '_' . $section_no . '_' . $field_no;
+				}
+				$base = $key;
+				$n    = 2;
+				while ( isset( $scope_keys[ $key ] ) ) {
+					$key = $base . '_' . $n++;
+				}
+				$scope_keys[ $key ] = true;
+
+				$cf = array(
+					'key'   => $key,
+					'type'  => $type,
+					'label' => isset( $field['label'] ) ? sanitize_text_field( $field['label'] ) : '',
+				);
+
+				if ( ! empty( $field['required'] ) ) {
+					$cf['required'] = true;
+				}
+				foreach ( array( 'placeholder', 'help', 'checkbox_label', 'default' ) as $str_key ) {
+					if ( isset( $field[ $str_key ] ) && '' !== $field[ $str_key ] ) {
+						$cf[ $str_key ] = sanitize_text_field( $field[ $str_key ] );
+					}
+				}
+				if ( isset( $field['width'] ) && in_array( (string) $field['width'], array( 'full', 'half', 'third' ), true ) ) {
+					$cf['width'] = $field['width'];
+				}
+				foreach ( array( 'min', 'max', 'step' ) as $num_key ) {
+					if ( isset( $field[ $num_key ] ) && '' !== $field[ $num_key ] ) {
+						$cf[ $num_key ] = is_numeric( $field[ $num_key ] ) ? $field[ $num_key ] + 0 : sanitize_text_field( $field[ $num_key ] );
+					}
+				}
+				foreach ( array( 'maxlength', 'rows' ) as $int_key ) {
+					if ( ! empty( $field[ $int_key ] ) ) {
+						$cf[ $int_key ] = (int) $field[ $int_key ];
+					}
+				}
+				if ( ! empty( $field['inline'] ) ) {
+					$cf['inline'] = true;
+				}
+
+				if ( in_array( $type, array( 'select', 'radio', 'checkbox_group' ), true ) ) {
+					$cf['options'] = array();
+					foreach ( (array) ( $field['options'] ?? array() ) as $opt_val => $opt_label ) {
+						$opt_val = sanitize_text_field( (string) $opt_val );
+						if ( '' === $opt_val ) {
+							continue;
+						}
+						$cf['options'][ $opt_val ] = sanitize_text_field( (string) $opt_label );
+					}
+				}
+
+				if ( 'file' === $type ) {
+					$defaults = self::default_file_settings();
+					$accept   = isset( $field['accept'] ) ? $field['accept'] : $defaults['accept'];
+					if ( is_string( $accept ) ) {
+						$accept = preg_split( '/[\s,]+/', $accept );
+					}
+					$blocked = self::blocked_extensions();
+					$accept  = array_values( array_unique( array_filter( array_map( function ( $ext ) {
+						return strtolower( preg_replace( '/[^a-z0-9]/i', '', (string) $ext ) );
+					}, (array) $accept ), function ( $ext ) use ( $blocked ) {
+						return '' !== $ext && ! in_array( $ext, $blocked, true );
+					} ) ) );
+
+					$cf['accept']    = ! empty( $accept ) ? $accept : $defaults['accept'];
+					$cf['max_size']  = isset( $field['max_size'] ) ? max( 1, (int) $field['max_size'] ) : $defaults['max_size'];
+					$cf['multiple']  = ! empty( $field['multiple'] );
+					$cf['max_files'] = isset( $field['max_files'] ) ? max( 1, (int) $field['max_files'] ) : $defaults['max_files'];
+				}
+
+				if ( 'html' === $type ) {
+					$cf['content'] = isset( $field['content'] ) ? wp_kses_post( $field['content'] ) : '';
+				}
+
+				if ( ! empty( $field['condition'] ) && is_array( $field['condition'] ) && ! empty( $field['condition']['field'] ) ) {
+					$operator = isset( $field['condition']['operator'] ) ? $field['condition']['operator'] : 'equals';
+					if ( ! in_array( $operator, array( 'equals', 'not_equals', 'not_empty', 'empty', 'contains' ), true ) ) {
+						$operator = 'equals';
+					}
+					$cf['condition'] = array(
+						'field'    => sanitize_key( $field['condition']['field'] ),
+						'operator' => $operator,
+						'value'    => isset( $field['condition']['value'] ) ? sanitize_text_field( (string) $field['condition']['value'] ) : '',
+					);
+				}
+
+				$clean_section['fields'][] = $cf;
+			}
+
+			unset( $scope_keys );
+			$clean[] = $clean_section;
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * Evaluates a field condition against a value map.
+	 *
+	 * @param array $condition {field, operator, value}.
+	 * @param array $values    key => submitted value.
+	 * @return bool
+	 */
+	public static function condition_matches( $condition, $values ) {
+		$actual   = $values[ $condition['field'] ] ?? '';
+		$expected = (string) ( $condition['value'] ?? '' );
+		$operator = $condition['operator'] ?? 'equals';
+
+		if ( is_array( $actual ) ) {
+			switch ( $operator ) {
+				case 'not_empty':
+					return ! empty( $actual );
+				case 'empty':
+					return empty( $actual );
+				case 'not_equals':
+					return ! in_array( $expected, array_map( 'strval', $actual ), true );
+				default:
+					return in_array( $expected, array_map( 'strval', $actual ), true );
+			}
+		}
+
+		$actual = (string) $actual;
+		switch ( $operator ) {
+			case 'not_equals':
+				return $actual !== $expected;
+			case 'not_empty':
+				return '' !== trim( $actual );
+			case 'empty':
+				return '' === trim( $actual );
+			case 'contains':
+				return '' !== $expected && false !== mb_stripos( $actual, $expected );
+			default:
+				return $actual === $expected;
+		}
 	}
 
 	/**
