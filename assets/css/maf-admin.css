@@ -1,0 +1,81 @@
+.maf-admin-wrap .maf-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 16px 0;
+	align-items: center;
+}
+
+.maf-toolbar select,
+.maf-toolbar input[type="text"] {
+	padding: 6px 8px;
+	border-radius: 4px;
+	border: 1px solid #8c8f94;
+}
+
+.maf-status {
+	display: inline-block;
+	padding: 2px 10px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: capitalize;
+}
+
+.maf-status--submitted { background: #e5f5fa; color: #0a4b78; }
+.maf-status--conditional { background: #fcf0d5; color: #8a6100; }
+.maf-status--approved { background: #e6f4ea; color: #1e6b34; }
+.maf-status--rejected { background: #fbe9e7; color: #a02622; }
+
+.maf-pagination {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin-top: 14px;
+}
+
+.maf-pagination__info {
+	color: #50575e;
+	font-size: 13px;
+}
+
+.maf-modal {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	z-index: 100000;
+	padding: 40px 20px;
+	overflow-y: auto;
+}
+
+.maf-modal__panel {
+	background: #fff;
+	border-radius: 8px;
+	max-width: 720px;
+	width: 100%;
+	padding: 24px;
+	position: relative;
+}
+
+.maf-modal__close {
+	position: absolute;
+	top: 10px;
+	inset-inline-end: 14px;
+	font-size: 22px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: #50575e;
+}
+
+.maf-modal__panel table {
+	margin-top: 10px;
+}
+
+.maf-modal__panel table th {
+	width: 30%;
+	text-align: start;
+}

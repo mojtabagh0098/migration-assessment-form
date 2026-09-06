@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wpml-config>
+	<custom-types>
+		<custom-type translate="1">maf_form</custom-type>
+	</custom-types>
+	<custom-fields>
+		<!--
+			_maf_form_schema is intentionally NOT copied between translations
+			(translate="0" / no entry = "Don't translate") — each language
+			edits its own labels/options directly in the schema editor.
+		-->
+	</custom-fields>
+</wpml-config>

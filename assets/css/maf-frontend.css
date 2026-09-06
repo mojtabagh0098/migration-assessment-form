@@ -1,0 +1,170 @@
+/*
+ * Assessment Form front-end styles.
+ * Uses logical properties (margin-inline, etc.) so the layout mirrors
+ * correctly for RTL languages (e.g. Persian) without a separate stylesheet.
+ */
+
+.maf-form {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	max-width: 820px;
+	margin: 0 auto;
+}
+
+.maf-card {
+	background: #fff;
+	border: 1px solid #e2e5e9;
+	border-radius: 10px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+	padding: 24px;
+}
+
+.maf-card__title {
+	margin: 0 0 16px;
+	font-size: 18px;
+	font-weight: 600;
+	color: #1d2327;
+	border-inline-start: 4px solid #2271b1;
+	padding-inline-start: 12px;
+}
+
+.maf-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 16px;
+}
+
+.maf-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.maf-field label {
+	font-weight: 500;
+	font-size: 14px;
+	color: #1d2327;
+}
+
+.maf-required {
+	color: #d63638;
+	margin-inline-start: 2px;
+}
+
+.maf-field input[type="text"],
+.maf-field input[type="email"],
+.maf-field input[type="number"],
+.maf-field input[type="tel"],
+.maf-field select,
+.maf-field textarea {
+	padding: 10px 12px;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	font-size: 14px;
+	width: 100%;
+	box-sizing: border-box;
+	transition: border-color 0.15s ease;
+}
+
+.maf-field input:focus,
+.maf-field select:focus,
+.maf-field textarea:focus {
+	outline: none;
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+}
+
+.maf-field--error input,
+.maf-field--error select,
+.maf-field--error textarea {
+	border-color: #d63638;
+}
+
+.maf-field__error {
+	color: #d63638;
+	font-size: 12px;
+	min-height: 14px;
+}
+
+.maf-repeater__row {
+	border: 1px dashed #c3c4c7;
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 12px;
+	position: relative;
+}
+
+.maf-repeater__remove {
+	margin-top: 10px;
+	background: none;
+	border: 1px solid #d63638;
+	color: #d63638;
+	border-radius: 6px;
+	padding: 6px 12px;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.maf-repeater__add {
+	background: #f0f6fc;
+	border: 1px dashed #2271b1;
+	color: #2271b1;
+	border-radius: 6px;
+	padding: 8px 14px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.maf-submit-row {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.maf-submit-btn {
+	background: #2271b1;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	padding: 14px 32px;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.15s ease;
+}
+
+.maf-submit-btn:hover {
+	background: #135e96;
+}
+
+.maf-submit-btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.maf-submit-status.maf-success {
+	color: #00a32a;
+	font-weight: 600;
+}
+
+.maf-submit-status.maf-error {
+	color: #d63638;
+	font-weight: 600;
+}
+
+/* Right-to-left languages (e.g. Persian via WPML) */
+html[dir="rtl"] .maf-card__title {
+	border-inline-start: none;
+	border-inline-end: 4px solid #2271b1;
+	padding-inline-start: 0;
+	padding-inline-end: 12px;
+}
+
+html[dir="rtl"] .maf-form,
+html[dir="rtl"] .maf-field input,
+html[dir="rtl"] .maf-field select,
+html[dir="rtl"] .maf-field textarea {
+	font-family: "Vazirmatn", Tahoma, sans-serif;
+}
