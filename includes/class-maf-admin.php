@@ -172,7 +172,7 @@ class MAF_Admin {
 		</div>
 
 		<!-- Entry detail / audit-log modal (hidden by default; toggled by maf-admin.js) -->
-		<div class="maf-modal" id="maf-entry-modal" hidden style="display: none;">
+		<div class="maf-modal" id="maf-entry-modal">
 			<div class="maf-modal__panel">
 				<button type="button" class="maf-modal__close" id="maf-modal-close">&times;</button>
 				<div id="maf-modal-body"></div>

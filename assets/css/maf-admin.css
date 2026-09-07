@@ -51,7 +51,7 @@
 	overflow-y: auto;
 }
 
-.maf-modal:not([hidden]) {
+.maf-modal.is-open {
 	display: flex;
 }
 

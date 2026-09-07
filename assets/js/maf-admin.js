@@ -183,13 +183,11 @@
 	function wireModal() {
 		var modal = document.getElementById( 'maf-entry-modal' );
 		document.getElementById( 'maf-modal-close' ).addEventListener( 'click', function () {
-			modal.hidden = true;
-			modal.style.display = 'none';
+			modal.classList.remove( 'is-open' );
 		} );
 		modal.addEventListener( 'click', function ( e ) {
 			if ( e.target === modal ) {
-				modal.hidden = true;
-				modal.style.display = 'none';
+				modal.classList.remove( 'is-open' );
 			}
 		} );
 	}
@@ -203,8 +201,7 @@
 		var modal = document.getElementById( 'maf-entry-modal' );
 		var body = document.getElementById( 'maf-modal-body' );
 		body.innerHTML = '<p>' + MAF_ADMIN_CONFIG.i18n.loading + '</p>';
-		modal.hidden = false;
-		modal.style.display = 'flex';
+		modal.classList.add( 'is-open' );
 
 
 		fetch( MAF_ADMIN_CONFIG.restUrl + 'entries/' + id, {
