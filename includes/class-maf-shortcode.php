@@ -121,17 +121,34 @@ class MAF_Shortcode {
 	private function render_field( $field, $prefix = '' ) {
 		$type        = $field['type'] ?? 'text';
 		$name        = $prefix ? $prefix . '[' . $field['key'] . ']' : $field['key'];
-		$field_id    = 'maf-field-' . sanitize_html_class( str_replace( array( '[', ']' ), '-', $name ) );
+		$field_id    = ! empty( $field['custom_id'] ) ? $field['custom_id'] : 'maf-field-' . sanitize_html_class( str_replace( array( '[', ']' ), '-', $name ) );
 		$required    = ! empty( $field['required'] );
 		$condition   = ! empty( $field['condition'] ) ? wp_json_encode( $field['condition'] ) : '';
-		$width       = isset( $field['width'] ) ? $field['width'] : 'full';
+		
+		// Updated width logic
+		$width_class = 'maf-field--w-';
+		$style = '';
+		if ( ! empty( $field['width_pc'] ) ) {
+			$width_class .= 'custom';
+			$style = ' style="width: ' . (int) $field['width_pc'] . '%;"';
+		} else {
+			$width_class .= ( isset( $field['width'] ) ? $field['width'] : 'full' );
+		}
+
 		$placeholder = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
 		$wrap_attrs  = $condition ? ' data-condition=\'' . esc_attr( $condition ) . '\' hidden' : '';
+		$wrap_attrs .= ' id="' . esc_attr( $field_id . '-wrap' ) . '"';
+		
+		$classes = 'maf-field maf-field--' . esc_attr( $type ) . ' ' . $width_class;
+		if ( ! empty( $field['custom_class'] ) ) {
+			$classes .= ' ' . esc_attr( $field['custom_class'] );
+		}
+
 		$req_attr    = $required ? ' required' : '';
 		$ph_attr     = $placeholder ? ' placeholder="' . esc_attr( $placeholder ) . '"' : '';
 		$maxlen_attr = ! empty( $field['maxlength'] ) ? ' maxlength="' . (int) $field['maxlength'] . '"' : '';
 		?>
-		<div class="maf-field maf-field--<?php echo esc_attr( $type ); ?> maf-field--w-<?php echo esc_attr( $width ); ?>" data-key="<?php echo esc_attr( $field['key'] ); ?>"<?php echo $wrap_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- already escaped above. ?>>
+		<div class="<?php echo esc_attr( $classes ); ?>" data-key="<?php echo esc_attr( $field['key'] ); ?>"<?php echo $wrap_attrs . $style; ?>>
 			<?php if ( 'html' === $type ) : ?>
 				<div class="maf-html"><?php echo wp_kses_post( $field['content'] ?? '' ); ?></div>
 				<?php return; ?>

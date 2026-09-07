@@ -265,6 +265,11 @@ html[dir="rtl"] .maf-field textarea {
 	font-size: 13px;
 }
 .maf-upload__name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.maf-field--w-custom {
+    grid-column: span 6;
+}
+
 .maf-upload__size { color: #8c8f94; font-size: 12px; }
 .maf-upload__remove {
 	border: 0;

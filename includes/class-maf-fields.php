@@ -586,6 +586,16 @@ class MAF_Fields {
 				if ( ! empty( $field['inline'] ) ) {
 					$cf['inline'] = true;
 				}
+				if ( ! empty( $field['width_pc'] ) ) {
+					$cf['width_pc'] = max( 1, min( 100, (int) $field['width_pc'] ) );
+				}
+				if ( ! empty( $field['custom_id'] ) ) {
+					$cf['custom_id'] = sanitize_key( $field['custom_id'] );
+				}
+				if ( ! empty( $field['custom_class'] ) ) {
+					$cf['custom_class'] = sanitize_text_field( $field['custom_class'] );
+				}
+
 
 				if ( in_array( $type, array( 'select', 'radio', 'checkbox_group' ), true ) ) {
 					$cf['options'] = array();

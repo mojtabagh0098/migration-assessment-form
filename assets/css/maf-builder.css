@@ -21,6 +21,30 @@
 #maf_form_schema .inside { margin: 0; padding: 0; }
 #maf_form_schema.postbox { overflow: visible; }
 
+/* Full Width Editor */
+.post-type-maf_form #poststuff #post-body.columns-2 {
+	margin-right: 0;
+}
+.post-type-maf_form #poststuff #post-body-content {
+	width: 100%;
+	float: none;
+}
+.post-type-maf_form #postbox-container-1 {
+	float: none;
+	width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	margin-top: 20px;
+}
+.post-type-maf_form #postbox-container-1 .postbox {
+	flex: 1;
+	min-width: 300px;
+}
+.post-type-maf_form #maf_form_schema {
+	width: 100%;
+}
+
 .maf-builder {
 	background: var(--mafb-bg);
 	color: var(--mafb-text);

@@ -43,12 +43,16 @@
 	position: fixed;
 	inset: 0;
 	background: rgba(0, 0, 0, 0.5);
-	display: flex;
+	display: none;
 	align-items: flex-start;
 	justify-content: center;
 	z-index: 100000;
 	padding: 40px 20px;
 	overflow-y: auto;
+}
+
+.maf-modal:not([hidden]) {
+	display: flex;
 }
 
 .maf-modal__panel {

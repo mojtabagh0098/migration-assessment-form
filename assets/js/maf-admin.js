@@ -184,10 +184,12 @@
 		var modal = document.getElementById( 'maf-entry-modal' );
 		document.getElementById( 'maf-modal-close' ).addEventListener( 'click', function () {
 			modal.hidden = true;
+			modal.style.display = 'none';
 		} );
 		modal.addEventListener( 'click', function ( e ) {
 			if ( e.target === modal ) {
 				modal.hidden = true;
+				modal.style.display = 'none';
 			}
 		} );
 	}
@@ -202,6 +204,8 @@
 		var body = document.getElementById( 'maf-modal-body' );
 		body.innerHTML = '<p>' + MAF_ADMIN_CONFIG.i18n.loading + '</p>';
 		modal.hidden = false;
+		modal.style.display = 'flex';
+
 
 		fetch( MAF_ADMIN_CONFIG.restUrl + 'entries/' + id, {
 			headers: { 'X-WP-Nonce': MAF_ADMIN_CONFIG.nonce },

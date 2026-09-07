@@ -944,6 +944,15 @@
 		pane.appendChild( control( I18N.width, widthWrap ) );
 
 		// Numeric constraints.
+		// New: Custom width (%), class, ID
+		if ( ! def.static ) {
+			var customRow = el( 'div', { class: 'maf-b-row' } );
+			customRow.appendChild( control( 'Width (%)', textInput( field.width_pc || '', function ( v ) { update( function ( f ) { v === '' ? delete f.width_pc : f.width_pc = parseInt( v, 10 ) || ''; } ); }, { type: 'number', min: 1, max: 100, class: 'small-text' } ) ) );
+			customRow.appendChild( control( 'Element ID', textInput( field.custom_id || '', function ( v ) { update( function ( f ) { v ? f.custom_id = v.replace(/[^a-z0-9_-]/gi, '') : delete f.custom_id; } ); }, { class: 'small-text code' } ) ) );
+			pane.appendChild( customRow );
+			pane.appendChild( control( 'CSS Class', textInput( field.custom_class || '', function ( v ) { update( function ( f ) { v ? f.custom_class = v : delete f.custom_class; } ); } ) ) );
+		}
+
 		if ( supports( 'min' ) || supports( 'maxlength' ) || supports( 'rows' ) ) {
 			var row = el( 'div', { class: 'maf-b-row' } );
 			var numType = field.type === 'date' ? 'date' : 'number';
