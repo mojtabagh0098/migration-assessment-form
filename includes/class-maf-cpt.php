@@ -251,7 +251,7 @@ class MAF_CPT {
 			<noscript><p><?php esc_html_e( 'The form builder requires JavaScript.', 'migration-assessment-form' ); ?></p></noscript>
 			<div class="maf-builder__loading"><span class="spinner is-active"></span></div>
 		</div>
-		<textarea name="maf_form_schema" id="maf_form_schema" hidden aria-hidden="true"><?php echo esc_textarea( $schema ); ?></textarea>
+		<textarea name="maf_form_schema" id="maf_form_schema_input" hidden aria-hidden="true"><?php echo esc_textarea( $schema ); ?></textarea>
 		<?php
 	}
 

@@ -35,7 +35,7 @@
 
 	function init() {
 		root     = document.getElementById( 'maf-builder' );
-		textarea = document.getElementById( 'maf_form_schema' );
+		textarea = document.getElementById( 'maf_form_schema_input' );
 		if ( ! root || ! textarea ) {
 			return;
 		}
