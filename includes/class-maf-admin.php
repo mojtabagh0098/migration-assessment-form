@@ -84,12 +84,26 @@ class MAF_Admin {
 
 		if ( isset( $_POST['maf_save_settings'] ) && check_admin_referer( 'maf_settings_action' ) ) {
 			update_option( 'maf_email_recipients', sanitize_text_field( $_POST['maf_email_recipients'] ) );
-			update_option( 'maf_email_schedule', sanitize_key( $_POST['maf_email_schedule'] ) );
+			update_option( 'maf_email_hour', max( 0, min( 23, intval( $_POST['maf_email_hour'] ) ) ) );
+			
+			// Save Templates
+			update_option( 'maf_template_user_confirmation', wp_kses_post( $_POST['maf_template_user_confirmation'] ) );
+			update_option( 'maf_template_admin_notification', wp_kses_post( $_POST['maf_template_admin_notification'] ) );
+			update_option( 'maf_template_daily_summary', wp_kses_post( $_POST['maf_template_daily_summary'] ) );
+			
+			if ( class_exists( 'MAF_Email' ) ) {
+				MAF_Email::reschedule_cron();
+			}
+
 			echo '<div class="notice notice-success"><p>' . esc_html__( 'Settings saved.', 'migration-assessment-form' ) . '</p></div>';
 		}
 
 		$recipients = get_option( 'maf_email_recipients', get_option( 'admin_email' ) );
-		$schedule   = get_option( 'maf_email_schedule', 'daily' );
+		$hour       = get_option( 'maf_email_hour', 9 );
+		
+		$tmpl_user  = get_option( 'maf_template_user_confirmation', 'Hello {first_name} {last_name}, thank you for your submission (ID: {entry_id}).' );
+		$tmpl_admin = get_option( 'maf_template_admin_notification', 'New submission received: {first_name} {last_name} (ID: {entry_id}).' );
+		$tmpl_daily = get_option( 'maf_template_daily_summary', 'Daily Report: {count} submissions received on {date}.\n\n{submissions_list}' );
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Assessment Form Settings', 'migration-assessment-form' ); ?></h1>
@@ -104,12 +118,31 @@ class MAF_Admin {
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="maf_email_schedule"><?php esc_html_e( 'Report Schedule', 'migration-assessment-form' ); ?></label></th>
+						<th scope="row"><label for="maf_email_hour"><?php esc_html_e( 'Daily Report Hour (0-23)', 'migration-assessment-form' ); ?></label></th>
 						<td>
-							<select name="maf_email_schedule" id="maf_email_schedule">
-								<option value="daily" <?php selected( $schedule, 'daily' ); ?>><?php esc_html_e( 'Daily', 'migration-assessment-form' ); ?></option>
-								<option value="weekly" <?php selected( $schedule, 'weekly' ); ?>><?php esc_html_e( 'Weekly', 'migration-assessment-form' ); ?></option>
-							</select>
+							<input name="maf_email_hour" type="number" id="maf_email_hour" value="<?php echo esc_attr( $hour ); ?>" min="0" max="23" />
+							<p class="description"><?php esc_html_e( 'The hour of the day (24-hour format) when the daily report will be sent.', 'migration-assessment-form' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="maf_template_user_confirmation"><?php esc_html_e( 'User Confirmation Email', 'migration-assessment-form' ); ?></label></th>
+						<td>
+							<textarea name="maf_template_user_confirmation" id="maf_template_user_confirmation" rows="5" class="large-text"><?php echo esc_textarea( $tmpl_user ); ?></textarea>
+							<p class="description"><?php esc_html_e( 'Placeholders: {first_name}, {last_name}, {email}, {entry_id}', 'migration-assessment-form' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="maf_template_admin_notification"><?php esc_html_e( 'Admin Submission Email', 'migration-assessment-form' ); ?></label></th>
+						<td>
+							<textarea name="maf_template_admin_notification" id="maf_template_admin_notification" rows="5" class="large-text"><?php echo esc_textarea( $tmpl_admin ); ?></textarea>
+							<p class="description"><?php esc_html_e( 'Placeholders: {first_name}, {last_name}, {email}, {entry_id}, {submission_date}', 'migration-assessment-form' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="maf_template_daily_summary"><?php esc_html_e( 'Daily Admin Report Email', 'migration-assessment-form' ); ?></label></th>
+						<td>
+							<textarea name="maf_template_daily_summary" id="maf_template_daily_summary" rows="5" class="large-text"><?php echo esc_textarea( $tmpl_daily ); ?></textarea>
+							<p class="description"><?php esc_html_e( 'Placeholders: {count}, {date}, {submissions_list}', 'migration-assessment-form' ); ?></p>
 						</td>
 					</tr>
 				</table>
