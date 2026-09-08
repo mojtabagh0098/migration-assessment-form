@@ -85,6 +85,7 @@ function maf_bootstrap_plugin() {
 	new MAF_REST();
 	new MAF_WPML();
 	new MAF_Export();
+	new MAF_Email();
 
 	if ( is_admin() ) {
 		new MAF_Admin();

@@ -25,7 +25,7 @@ class MAF_Admin {
 	}
 
 	/**
-	 * Registers the top-level "Assessment Forms" menu plus the "Entries" submenu.
+	 * Registers the top-level "Assessment Forms" menu plus the "Entries" and "Settings" submenu.
 	 * The CPT itself (`register_post_type`) is attached to this same menu slug.
 	 */
 	public function register_menu() {
@@ -63,6 +63,60 @@ class MAF_Admin {
 			'manage_options',
 			'post-new.php?post_type=' . MAF_CPT::POST_TYPE
 		);
+		
+		add_submenu_page(
+			'maf_main_menu',
+			__( 'Settings', 'migration-assessment-form' ),
+			__( 'Settings', 'migration-assessment-form' ),
+			'manage_options',
+			'maf_settings',
+			array( $this, 'render_settings_page' )
+		);
+	}
+
+	/**
+	 * Renders the Settings admin page.
+	 */
+	public function render_settings_page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( isset( $_POST['maf_save_settings'] ) && check_admin_referer( 'maf_settings_action' ) ) {
+			update_option( 'maf_email_recipients', sanitize_text_field( $_POST['maf_email_recipients'] ) );
+			update_option( 'maf_email_schedule', sanitize_key( $_POST['maf_email_schedule'] ) );
+			echo '<div class="notice notice-success"><p>' . esc_html__( 'Settings saved.', 'migration-assessment-form' ) . '</p></div>';
+		}
+
+		$recipients = get_option( 'maf_email_recipients', get_option( 'admin_email' ) );
+		$schedule   = get_option( 'maf_email_schedule', 'daily' );
+		?>
+		<div class="wrap">
+			<h1><?php esc_html_e( 'Assessment Form Settings', 'migration-assessment-form' ); ?></h1>
+			<form method="post">
+				<?php wp_nonce_field( 'maf_settings_action' ); ?>
+				<table class="form-table">
+					<tr>
+						<th scope="row"><label for="maf_email_recipients"><?php esc_html_e( 'Notification Recipients', 'migration-assessment-form' ); ?></label></th>
+						<td>
+							<input name="maf_email_recipients" type="text" id="maf_email_recipients" value="<?php echo esc_attr( $recipients ); ?>" class="regular-text" />
+							<p class="description"><?php esc_html_e( 'Comma-separated email addresses.', 'migration-assessment-form' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="maf_email_schedule"><?php esc_html_e( 'Report Schedule', 'migration-assessment-form' ); ?></label></th>
+						<td>
+							<select name="maf_email_schedule" id="maf_email_schedule">
+								<option value="daily" <?php selected( $schedule, 'daily' ); ?>><?php esc_html_e( 'Daily', 'migration-assessment-form' ); ?></option>
+								<option value="weekly" <?php selected( $schedule, 'weekly' ); ?>><?php esc_html_e( 'Weekly', 'migration-assessment-form' ); ?></option>
+							</select>
+						</td>
+					</tr>
+				</table>
+				<?php submit_button( __( 'Save Changes', 'migration-assessment-form' ), 'primary', 'maf_save_settings' ); ?>
+			</form>
+		</div>
+		<?php
 	}
 
 	/**
