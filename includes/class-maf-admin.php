@@ -106,7 +106,83 @@ class MAF_Admin {
 		$hour       = get_option( 'maf_email_hour', 9 );
 		$minute     = get_option( 'maf_email_minute', 0 );
 		
-		$tmpl_user  = get_option( 'maf_template_user_confirmation', 'Hello {first_name} {last_name}, thank you for your submission (ID: {entry_id}).' );
+		$tmpl_user_default = '<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Submission Confirmation</title>
+</head>
+<body style="margin:0; padding:0; background:#f3f5f9; font-family:Arial, Tahoma, sans-serif; color:#2e2f34;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f3f5f9;">
+    <tr>
+        <td align="center" style="padding:40px 15px;">
+            <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background:#ffffff; border-radius:12px; overflow:hidden;">
+                <tr>
+                    <td style="padding:24px 30px; border-bottom:1px solid #eeeeee;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td align="left">
+                                    <img src="{{logo_url}}" alt="ICP Immigration" width="120" style="display:block; border:0;">
+                                </td>
+                                <td align="right" style="font-size:12px; color:#777777;">ICP Immigration</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" style="padding:45px 30px 20px;">
+                        <div style="width:58px; height:58px; line-height:58px; background:#fcebec; border-radius:50%; color:#c7232d; font-size:28px; margin:auto;">✓</div>
+                        <h1 style="margin:22px 0 10px; font-size:24px; color:#2e2f34; font-weight:700;">Thank You!</h1>
+                        <p style="margin:0; font-size:15px; line-height:1.8; color:#666666;">Your form has been successfully submitted.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px 40px 10px;">
+                        <p style="margin:0; font-size:14px; line-height:2; color:#555555;">Dear <strong>{{user_name}}</strong>,</p>
+                        <p style="margin:10px 0 0; font-size:14px; line-height:2; color:#555555;">Thank you for contacting ICP Immigration. We have received your request and one of our consultants will review it and contact you as soon as possible.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px 40px 30px;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f7f9; border-radius:8px;">
+                            <tr>
+                                <td colspan="2" style="padding:16px 18px; border-bottom:1px solid #e8e8e8;"><strong style="font-size:14px;">Submission Details</strong></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:12px 18px; font-size:13px; color:#777;">Form</td>
+                                <td align="right" style="padding:12px 18px; font-size:13px; color:#333;">{{form_name}}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:12px 18px; font-size:13px; color:#777;">Date</td>
+                                <td align="right" style="padding:12px 18px; font-size:13px; color:#333;">{{submission_date}}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:12px 18px; font-size:13px; color:#777;">Reference</td>
+                                <td align="right" style="padding:12px 18px; font-size:13px; color:#333;">{{submission_id}}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" style="padding:0 40px 40px;">
+                        <a href="{{website_url}}" style="display:inline-block; background:#c7232d; color:#ffffff; text-decoration:none; padding:13px 28px; border-radius:6px; font-size:14px; font-weight:bold;">Visit Our Website</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background:#2e2f34; padding:28px 30px; text-align:center;">
+                        <p style="margin:0 0 10px; color:#ffffff; font-size:13px;">ICP Immigration</p>
+                        <p style="margin:0; color:#aaaaaa; font-size:11px; line-height:1.8;">This is an automated email. Please do not reply directly to this message.</p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>';
+
+		$tmpl_user  = get_option( 'maf_template_user_confirmation', $tmpl_user_default );
 		$tmpl_admin = get_option( 'maf_template_admin_notification', 'New submission received: {first_name} {last_name} (ID: {entry_id}).' );
 		$tmpl_daily = get_option( 'maf_template_daily_summary', 'Daily Report: {count} submissions received on {date}.<br><br>{submissions_list}' );
 		?>

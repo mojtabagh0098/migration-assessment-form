@@ -48,28 +48,55 @@ class MAF_Email {
 		return $template;
 	}
 
+	/**
+	 * Helper to replace placeholders in templates.
+	 */
 	private function replace_placeholders( $template, $data ) {
-		// Add global site placeholders
-		$data['{site_name}'] = get_bloginfo( 'name' );
-		$data['{site_url}']  = get_site_url();
+		// Global placeholders
+		$data['{site_name}']    = get_bloginfo( 'name' );
+		$data['{site_url}']     = get_site_url();
+		$data['{{website_url}}'] = get_site_url();
+		$data['{{logo_url}}']    = get_header_image() ? get_header_image() : MAF_PLUGIN_URL . 'assets/logo-placeholder.png'; // Fallback logo
 
 		$keys = array_keys( $data );
 		$values = array_values( $data );
+		
+		// Support both {key} and {{key}} formats
 		return str_replace( $keys, $values, $template );
 	}
 
+	/**
+	 * Sends a confirmation email to the user upon submission.
+	 */
 	public function send_user_confirmation( $entry_id, $clean_data, $form_id ) {
-		if ( empty( $clean_data['email'] ) ) return;
+		if ( empty( $clean_data['email'] ) ) {
+			return;
+		}
 
-		$tmpl = get_option( 'maf_template_user_confirmation', 'Hello {first_name} {last_name}, thank you for your submission (ID: {entry_id}).' );
+		$form_post = get_post( $form_id );
+		$form_name = $form_post ? $form_post->post_title : __( 'Assessment Form', 'migration-assessment-form' );
+
+		$tmpl = get_option( 'maf_template_user_confirmation', '' );
+		
+		// If template is empty, we will use your provided HTML as a fallback later or assume it's set in DB.
 		$data = array(
-			'{first_name}' => $clean_data['first_name'] ?? '',
-			'{last_name}'  => $clean_data['last_name'] ?? '',
-			'{email}'      => $clean_data['email'] ?? '',
-			'{entry_id}'   => $entry_id,
+			'{first_name}'      => $clean_data['first_name'] ?? '',
+			'{last_name}'       => $clean_data['last_name'] ?? '',
+			'{{user_name}}'     => ($clean_data['first_name'] ?? '') . ' ' . ($clean_data['last_name'] ?? ''),
+			'{email}'           => $clean_data['email'] ?? '',
+			'{entry_id}'        => $entry_id,
+			'{{submission_id}}' => $entry_id,
+			'{{form_name}}'     => $form_name,
+			'{{submission_date}}' => date_i18n( get_option( 'date_format' ) ),
 		);
 
-		$message = $this->wrap_email( $this->replace_placeholders( $tmpl, $data ) );
+		$message = $this->replace_placeholders( $tmpl, $data );
+		
+		// If the template contains <html> tags, don't wrap it in the default wrapper
+		if ( strpos( $message, '<html' ) === false ) {
+			$message = $this->wrap_email( $message );
+		}
+
 		wp_mail( $clean_data['email'], __( 'Form Submission Received', 'migration-assessment-form' ), $message, array('Content-Type: text/html; charset=UTF-8') );
 	}
 
