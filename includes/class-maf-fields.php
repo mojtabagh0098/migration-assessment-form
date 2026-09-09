@@ -570,9 +570,21 @@ class MAF_Fields {
 						$cf[ $str_key ] = sanitize_text_field( $field[ $str_key ] );
 					}
 				}
-				if ( isset( $field['width'] ) && in_array( (string) $field['width'], array( 'full', 'half', 'third' ), true ) ) {
-					$cf['width'] = $field['width'];
+				// Width Sanitization
+				$legacy_width = isset( $field['width'] ) && in_array( (string) $field['width'], array( 'full', 'half', 'third' ), true ) ? (string) $field['width'] : 'full';
+				$cf['width']  = isset( $field['width_desktop'] ) && in_array( (string) $field['width_desktop'], array( 'full', 'half', 'third' ), true ) ? (string) $field['width_desktop'] : $legacy_width;
+				$cf['width_desktop'] = $cf['width'];
+
+				foreach ( array( 'width_laptop', 'width_tablet', 'width_mobile' ) as $device_width ) {
+					if ( isset( $field[ $device_width ] ) && in_array( (string) $field[ $device_width ], array( 'full', 'half', 'third' ), true ) ) {
+						$cf[ $device_width ] = (string) $field[ $device_width ];
+					}
 				}
+
+				if ( ! empty( $field['width_pc'] ) ) {
+					$cf['width_pc'] = max( 1, min( 100, (int) $field['width_pc'] ) );
+				}
+
 				foreach ( array( 'min', 'max', 'step' ) as $num_key ) {
 					if ( isset( $field[ $num_key ] ) && '' !== $field[ $num_key ] ) {
 						$cf[ $num_key ] = is_numeric( $field[ $num_key ] ) ? $field[ $num_key ] + 0 : sanitize_text_field( $field[ $num_key ] );
@@ -585,9 +597,6 @@ class MAF_Fields {
 				}
 				if ( ! empty( $field['inline'] ) ) {
 					$cf['inline'] = true;
-				}
-				if ( ! empty( $field['width_pc'] ) ) {
-					$cf['width_pc'] = max( 1, min( 100, (int) $field['width_pc'] ) );
 				}
 				if ( ! empty( $field['custom_id'] ) ) {
 					$cf['custom_id'] = sanitize_key( $field['custom_id'] );
