@@ -125,15 +125,16 @@ class MAF_Shortcode {
 		$required    = ! empty( $field['required'] );
 		$condition   = ! empty( $field['condition'] ) ? wp_json_encode( $field['condition'] ) : '';
 		
-		// Updated width logic
-		$width_class = 'maf-field--w-';
-		$style = '';
+		// Width logic - convert to percentage for inline style.
+		$width_map = array( 'full' => 100, 'half' => 50, 'third' => 33.3333 );
 		if ( ! empty( $field['width_pc'] ) ) {
-			$width_class .= 'custom';
-			$style = ' style="width: ' . (int) $field['width_pc'] . '%;"';
+			$pct = max( 1, min( 100, (int) $field['width_pc'] ) );
 		} else {
-			$width_class .= ( isset( $field['width'] ) ? $field['width'] : 'full' );
+			$w   = isset( $field['width'] ) ? $field['width'] : 'full';
+			$pct = isset( $width_map[ $w ] ) ? $width_map[ $w ] : 100;
 		}
+		$style       = ' style="--maf-field-w:' . $pct . '%"';
+		$width_class = 'maf-field--w-' . ( $pct == 100 ? 'full' : ( $pct == 50 ? 'half' : ( $pct <= 33.3334 ? 'third' : 'custom' ) ) );
 
 		$placeholder = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
 		$wrap_attrs  = $condition ? ' data-condition=\'' . esc_attr( $condition ) . '\' hidden' : '';

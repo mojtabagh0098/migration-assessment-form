@@ -30,15 +30,19 @@
 }
 
 .maf-grid {
-	display: grid;
-	grid-template-columns: repeat(6, 1fr);
-	gap: 16px;
+	display: flex;
+	flex-wrap: wrap;
+	margin: -8px;
 }
 
 .maf-field {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
+	width: var(--maf-field-w, 100%);
+	padding: 8px;
+	min-width: 0;
+	box-sizing: border-box;
 }
 
 .maf-field label {
@@ -173,13 +177,13 @@ html[dir="rtl"] .maf-field textarea {
 /* Builder-driven additions: widths, choices, uploads, content blocks  */
 /* ------------------------------------------------------------------ */
 
-.maf-field--w-full { grid-column: span 6; }
-.maf-field--w-half { grid-column: span 3; }
-.maf-field--w-third { grid-column: span 2; }
+.maf-field--w-full  { --maf-field-w: 100%; }
+.maf-field--w-half  { --maf-field-w: 50%;  }
+.maf-field--w-third { --maf-field-w: 33.3333%; }
 
 @media (max-width: 640px) {
 	.maf-field--w-half,
-	.maf-field--w-third { grid-column: span 6; }
+	.maf-field--w-third { --maf-field-w: 100%; }
 }
 
 .maf-card__desc {
@@ -266,8 +270,13 @@ html[dir="rtl"] .maf-field textarea {
 }
 .maf-upload__name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* Custom width is set via inline --maf-field-w */
 .maf-field--w-custom {
-    grid-column: span 6;
+	/* --maf-field-w already set inline */
+}
+
+@media (max-width: 640px) {
+	.maf-field--w-custom { --maf-field-w: 100%; }
 }
 
 .maf-upload__size { color: #8c8f94; font-size: 12px; }
