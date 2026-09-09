@@ -83,7 +83,9 @@ class MAF_Admin {
 		}
 
 		if ( isset( $_POST['maf_save_settings'] ) && check_admin_referer( 'maf_settings_action' ) ) {
-			update_option( 'maf_email_recipients', sanitize_text_field( $_POST['maf_email_recipients'] ) );
+			update_option( 'maf_instant_email_recipients', sanitize_text_field( $_POST['maf_instant_email_recipients'] ) );
+			update_option( 'maf_daily_email_recipients', sanitize_text_field( $_POST['maf_daily_email_recipients'] ) );
+			update_option( 'maf_email_recipients', sanitize_text_field( $_POST['maf_instant_email_recipients'] ) );
 			
 			$hour   = max( 0, min( 23, intval( $_POST['maf_email_hour'] ) ) );
 			$minute = max( 0, min( 59, intval( $_POST['maf_email_minute'] ) ) );
@@ -102,7 +104,8 @@ class MAF_Admin {
 			echo '<div class="notice notice-success"><p>' . esc_html__( 'Settings saved.', 'migration-assessment-form' ) . '</p></div>';
 		}
 
-		$recipients = get_option( 'maf_email_recipients', get_option( 'admin_email' ) );
+		$instant_recipients = get_option( 'maf_instant_email_recipients', get_option( 'maf_email_recipients', get_option( 'admin_email' ) ) );
+		$daily_recipients   = get_option( 'maf_daily_email_recipients', get_option( 'maf_email_recipients', get_option( 'admin_email' ) ) );
 		$hour       = get_option( 'maf_email_hour', 9 );
 		$minute     = get_option( 'maf_email_minute', 0 );
 		
@@ -192,10 +195,17 @@ class MAF_Admin {
 				<?php wp_nonce_field( 'maf_settings_action' ); ?>
 				<table class="form-table">
 					<tr>
-						<th scope="row"><label for="maf_email_recipients"><?php esc_html_e( 'Notification Recipients', 'migration-assessment-form' ); ?></label></th>
+						<th scope="row"><label for="maf_instant_email_recipients"><?php esc_html_e( 'Instant Submission Recipients', 'migration-assessment-form' ); ?></label></th>
 						<td>
-							<input name="maf_email_recipients" type="text" id="maf_email_recipients" value="<?php echo esc_attr( $recipients ); ?>" class="regular-text" />
-							<p class="description"><?php esc_html_e( 'Comma-separated email addresses.', 'migration-assessment-form' ); ?></p>
+							<input name="maf_instant_email_recipients" type="text" id="maf_instant_email_recipients" value="<?php echo esc_attr( $instant_recipients ); ?>" class="regular-text" />
+							<p class="description"><?php esc_html_e( 'Comma-separated email addresses to notify immediately when a form is submitted (supports multiple recipients).', 'migration-assessment-form' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="maf_daily_email_recipients"><?php esc_html_e( 'Daily Report Recipients', 'migration-assessment-form' ); ?></label></th>
+						<td>
+							<input name="maf_daily_email_recipients" type="text" id="maf_daily_email_recipients" value="<?php echo esc_attr( $daily_recipients ); ?>" class="regular-text" />
+							<p class="description"><?php esc_html_e( 'Comma-separated email addresses to receive the daily summary report of submitted forms (supports multiple recipients).', 'migration-assessment-form' ); ?></p>
 						</td>
 					</tr>
 					<tr>

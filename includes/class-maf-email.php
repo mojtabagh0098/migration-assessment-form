@@ -14,9 +14,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class MAF_Email {
 
-	const OPTION_RECIPIENTS = 'maf_email_recipients';
-	const OPTION_HOUR       = 'maf_email_hour';
-	const CRON_HOOK         = 'maf_send_scheduled_report';
+	const OPTION_RECIPIENTS         = 'maf_email_recipients';
+	const OPTION_INSTANT_RECIPIENTS = 'maf_instant_email_recipients';
+	const OPTION_DAILY_RECIPIENTS   = 'maf_daily_email_recipients';
+	const OPTION_HOUR               = 'maf_email_hour';
+	const CRON_HOOK                 = 'maf_send_scheduled_report';
 
 	public function __construct() {
 		add_action( 'maf_entry_submitted', array( $this, 'send_user_confirmation' ), 10, 3 );
@@ -101,7 +103,7 @@ class MAF_Email {
 	}
 
 	public function send_admin_notification( $entry_id, $clean_data, $form_id ) {
-		$recipients = get_option( self::OPTION_RECIPIENTS, get_option( 'admin_email' ) );
+		$recipients = get_option( self::OPTION_INSTANT_RECIPIENTS, get_option( self::OPTION_RECIPIENTS, get_option( 'admin_email' ) ) );
 		if ( empty( $recipients ) ) return;
 
 		$tmpl = get_option( 'maf_template_admin_notification', 'New submission received: {first_name} {last_name} (ID: {entry_id}).' );
@@ -121,7 +123,7 @@ class MAF_Email {
 	public function send_scheduled_report() {
 		global $wpdb;
 
-		$recipients = get_option( self::OPTION_RECIPIENTS, get_option( 'admin_email' ) );
+		$recipients = get_option( self::OPTION_DAILY_RECIPIENTS, get_option( self::OPTION_RECIPIENTS, get_option( 'admin_email' ) ) );
 		if ( empty( $recipients ) ) return;
 
 		$table      = $wpdb->prefix . 'maf_entries';
