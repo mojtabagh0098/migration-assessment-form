@@ -186,8 +186,8 @@ class MAF_Admin {
 </html>';
 
 		$tmpl_user  = get_option( 'maf_template_user_confirmation', $tmpl_user_default );
-		$tmpl_admin = get_option( 'maf_template_admin_notification', 'New submission received: {first_name} {last_name} (ID: {entry_id}).' );
-		$tmpl_daily = get_option( 'maf_template_daily_summary', 'Daily Report: {count} submissions received on {date}.<br><br>{submissions_list}' );
+		$tmpl_admin = get_option( 'maf_template_admin_notification', class_exists( 'MAF_Email' ) ? MAF_Email::get_default_admin_template() : '' );
+		$tmpl_daily = get_option( 'maf_template_daily_summary', class_exists( 'MAF_Email' ) ? MAF_Email::get_default_daily_template() : '' );
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Assessment Form Settings', 'migration-assessment-form' ); ?></h1>
