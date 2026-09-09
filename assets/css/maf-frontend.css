@@ -288,3 +288,32 @@ html[dir="rtl"] .maf-field textarea {
 .maf-repeater__add:disabled { opacity: .45; cursor: not-allowed; }
 
 .maf-form.is-submitting { opacity: .7; pointer-events: none; }
+
+
+/* ------------------------------------------------------------------ */
+/* Conditional Fields Logic & Animations                              */
+/* ------------------------------------------------------------------ */
+
+[hidden],
+.maf-form [hidden],
+.maf-field[hidden],
+.maf-field--conditional[hidden] {
+	display: none !important;
+}
+
+.maf-field[data-condition]:not([hidden]),
+.maf-field--conditional:not([hidden]) {
+	display: flex;
+	animation: mafFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes mafFadeIn {
+	0% {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}

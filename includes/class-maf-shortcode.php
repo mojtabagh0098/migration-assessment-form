@@ -140,6 +140,9 @@ class MAF_Shortcode {
 		$wrap_attrs .= ' id="' . esc_attr( $field_id . '-wrap' ) . '"';
 		
 		$classes = 'maf-field maf-field--' . esc_attr( $type ) . ' ' . $width_class;
+		if ( $condition ) {
+			$classes .= ' maf-field--conditional';
+		}
 		if ( ! empty( $field['custom_class'] ) ) {
 			$classes .= ' ' . esc_attr( $field['custom_class'] );
 		}
