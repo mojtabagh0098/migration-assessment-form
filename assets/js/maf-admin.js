@@ -220,10 +220,8 @@
 				params.set( map[ id ], val );
 			}
 		} );
-		return params.toString();
-	}
+
 		var rows = document.querySelectorAll( '.maf-filter-row' );
-		var advFilters = [];
 		rows.forEach( function ( row, index ) {
 			var field = row.querySelector( '.maf-filter-field' ).value;
 			var op = row.querySelector( '.maf-filter-op' ).value;
@@ -243,6 +241,73 @@
 				params.set( 'adv_filters[' + index + '][val]', val );
 			}
 		} );
+
+		return params.toString();
+	}
+
+	function updateValueInput( row ) {
+		var fieldKey = row.querySelector( '.maf-filter-field' ).value;
+		var op = row.querySelector( '.maf-filter-op' ).value;
+		var valContainer = row.querySelector( '.maf-filter-val-container' );
+		var fieldDef = getFieldDef( fieldKey );
+		var type = fieldDef.type || 'text';
+
+		valContainer.innerHTML = '';
+
+		if ( op === 'empty' || op === 'not_empty' ) {
+			return;
+		}
+
+		if ( op === 'between' ) {
+			var input1 = document.createElement( 'input' );
+			input1.type = type === 'number' ? 'number' : ( type === 'date' ? 'date' : 'text' );
+			input1.className = 'maf-filter-val1';
+			input1.style.width = '100px';
+			input1.style.marginRight = '5px';
+			input1.placeholder = 'Min';
+
+			var input2 = document.createElement( 'input' );
+			input2.type = type === 'number' ? 'number' : ( type === 'date' ? 'date' : 'text' );
+			input2.className = 'maf-filter-val2';
+			input2.style.width = '100px';
+			input2.placeholder = 'Max';
+
+			valContainer.appendChild( input1 );
+			valContainer.appendChild( input2 );
+			return;
+		}
+
+		if ( [ 'select', 'radio', 'country' ].indexOf( type ) !== -1 && fieldDef.options ) {
+			var select = document.createElement( 'select' );
+			select.className = 'maf-filter-val';
+			select.innerHTML = '<option value="">— Select value —</option>';
+			var opts = fieldDef.options;
+			if ( Array.isArray( opts ) ) {
+				opts.forEach( function ( optVal ) {
+					var opt = document.createElement( 'option' );
+					opt.value = optVal;
+					opt.textContent = optVal;
+					select.appendChild( opt );
+				} );
+			} else if ( typeof opts === 'object' && opts !== null ) {
+				Object.keys( opts ).forEach( function ( k ) {
+					var opt = document.createElement( 'option' );
+					opt.value = k;
+					opt.textContent = opts[ k ];
+					select.appendChild( opt );
+				} );
+			}
+			valContainer.appendChild( select );
+			return;
+		}
+
+		var input = document.createElement( 'input' );
+		input.type = type === 'number' ? 'number' : ( type === 'date' ? 'date' : 'email' === type ? 'email' : 'tel_intl' === type ? 'tel' : 'text' );
+		input.className = 'maf-filter-val';
+		input.style.width = '160px';
+		input.placeholder = 'Value…';
+		valContainer.appendChild( input );
+	}
 
 
 	/** Fetches the filtered/paginated entries list and renders the table. */
