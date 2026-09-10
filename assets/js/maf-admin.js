@@ -311,6 +311,26 @@
 
 
 	/** Fetches the filtered/paginated entries list and renders the table. */
+	function fetchEntries() {
+		var tbody = document.getElementById( 'maf-entries-tbody' );
+		tbody.innerHTML = '<tr><td colspan="8">' + MAF_ADMIN_CONFIG.i18n.loading + '</td></tr>';
+
+		var url = MAF_ADMIN_CONFIG.restUrl + 'entries?page=' + state.page + '&per_page=' + state.perPage + '&' + buildFilterQuery();
+
+		fetch( url, {
+			headers: { 'X-WP-Nonce': MAF_ADMIN_CONFIG.nonce }
+		} )
+			.then( function ( res ) { return res.json(); } )
+			.then( function ( data ) {
+				renderEntries( data );
+			} )
+			.catch( function () {
+				tbody.innerHTML = '<tr><td colspan="8">' + MAF_ADMIN_CONFIG.i18n.error + '</td></tr>';
+			} );
+	}
+
+
+	/** Fetches the filtered/paginated entries list and renders the table. */
 	function getFieldDef( fieldKey ) {
 		var formId = document.getElementById( 'maf-filter-form' ).value;
 		var schemas = MAF_ADMIN_CONFIG.schemas || {};
