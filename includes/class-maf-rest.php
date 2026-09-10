@@ -26,6 +26,197 @@ class MAF_REST {
 	const NAMESPACE_URI = 'maf/v1';
 
 	/**
+	 * Builds secure, server-validated SQL clauses for advanced dynamic filters.
+	 * Acts as the single source of truth for both REST API and CSV/PDF Export.
+	 *
+	 * @param array  $adv_filters Raw filter array from request.
+	 * @param int    $form_id     Form ID constraint (0 if all forms).
+	 * @param object $wpdb        WordPress DB instance.
+	 * @return array {where: string, values: array}
+	 */
+	public static function build_advanced_filter_clauses( $adv_filters, $form_id, $wpdb ) {
+		$sub_wheres = array();
+		$sub_values = array();
+
+		$dedicated_columns = array(
+			'first_name'          => 'string',
+			'last_name'           => 'string',
+			'email'               => 'string',
+			'phone'               => 'string',
+			'age'                 => 'number',
+			'country_residence'   => 'string',
+			'country_citizenship' => 'string',
+			'marital_status'      => 'string',
+			'net_worth_cad'       => 'number',
+			'status'              => 'string',
+			'language'            => 'string',
+		);
+
+		$schemas = array();
+		if ( $form_id > 0 ) {
+			$schemas[ $form_id ] = MAF_Fields::flatten( MAF_Fields::get_schema( $form_id ) );
+		} else {
+			$forms = get_posts( array( 'post_type' => MAF_CPT::POST_TYPE, 'posts_per_page' => -1, 'post_status' => 'publish' ) );
+			foreach ( $forms as $form ) {
+				$schemas[ $form->ID ] = MAF_Fields::flatten( MAF_Fields::get_schema( $form->ID ) );
+			}
+		}
+
+		foreach ( (array) $adv_filters as $f ) {
+			if ( ! is_array( $f ) || empty( $f['field'] ) || empty( $f['op'] ) ) {
+				continue;
+			}
+			$field_key = sanitize_key( $f['field'] );
+			$op        = sanitize_key( $f['op'] );
+
+			$is_dedicated = isset( $dedicated_columns[ $field_key ] );
+			$field_type   = 'text';
+
+			if ( $is_dedicated ) {
+				$field_type = 'number' === $dedicated_columns[ $field_key ] ? 'number' : 'text';
+			} else {
+				$found_def = null;
+				foreach ( $schemas as $s_map ) {
+					if ( isset( $s_map[ $field_key ] ) ) {
+						$found_def = $s_map[ $field_key ];
+						break;
+					}
+				}
+				if ( ! $found_def ) {
+					continue;
+				}
+				$field_type = $found_def['type'] ?? 'text';
+			}
+
+			$valid_ops = array( 'equals', 'not_equals', 'empty', 'not_empty' );
+			if ( in_array( $field_type, array( 'text', 'textarea', 'email', 'tel_intl', 'url' ), true ) ) {
+				$valid_ops = array( 'contains', 'equals', 'not_equals', 'empty', 'not_empty' );
+			} elseif ( in_array( $field_type, array( 'number', 'date' ), true ) ) {
+				$valid_ops = array( 'equals', 'not_equals', 'greater_than', 'greater_than_equal', 'less_than', 'less_than_equal', 'between', 'empty', 'not_empty' );
+			}
+
+			if ( ! in_array( $op, $valid_ops, true ) ) {
+				continue;
+			}
+
+			$col_ref = '';
+			if ( $is_dedicated ) {
+				$col_ref = $field_key;
+			} else {
+				$col_ref = $wpdb->prepare( "JSON_UNQUOTE(JSON_EXTRACT(data, %s))", '$.' . $field_key );
+			}
+
+			if ( 'empty' === $op ) {
+				if ( $is_dedicated ) {
+					$sub_wheres[] = "({$col_ref} IS NULL OR {$col_ref} = '')";
+				} else {
+					$sub_wheres[] = "({$col_ref} IS NULL OR {$col_ref} = '' OR {$col_ref} = 'null')";
+				}
+				continue;
+			}
+			if ( 'not_empty' === $op ) {
+				if ( $is_dedicated ) {
+					$sub_wheres[] = "({$col_ref} IS NOT NULL AND {$col_ref} != '')";
+				} else {
+					$sub_wheres[] = "({$col_ref} IS NOT NULL AND {$col_ref} != '' AND {$col_ref} != 'null')";
+				}
+				continue;
+			}
+
+			if ( 'between' === $op ) {
+				$val1 = sanitize_text_field( wp_unslash( $f['val1'] ?? '' ) );
+				$val2 = sanitize_text_field( wp_unslash( $f['val2'] ?? '' ) );
+				if ( '' === $val1 || '' === $val2 ) {
+					continue;
+				}
+				if ( 'number' === $field_type ) {
+					$sub_wheres[] = "({$col_ref} + 0 BETWEEN %f AND %f)";
+					$sub_values[] = (float) $val1;
+					$sub_values[] = (float) $val2;
+				} else {
+					$sub_wheres[] = "({$col_ref} BETWEEN %s AND %s)";
+					$sub_values[] = $val1;
+					$sub_values[] = $val2;
+				}
+				continue;
+			}
+
+			$val = sanitize_text_field( wp_unslash( $f['val'] ?? '' ) );
+
+			switch ( $op ) {
+				case 'contains':
+					$sub_wheres[] = "({$col_ref} LIKE %s)";
+					$sub_values[] = '%' . $wpdb->esc_like( $val ) . '%';
+					break;
+				case 'equals':
+					if ( 'number' === $field_type ) {
+						$sub_wheres[] = "({$col_ref} + 0 = %f)";
+						$sub_values[] = (float) $val;
+					} else {
+						$sub_wheres[] = "({$col_ref} = %s)";
+						$sub_values[] = $val;
+					}
+					break;
+				case 'not_equals':
+					if ( 'number' === $field_type ) {
+						$sub_wheres[] = "({$col_ref} + 0 != %f)";
+						$sub_values[] = (float) $val;
+					} else {
+						$sub_wheres[] = "({$col_ref} != %s)";
+						$sub_values[] = $val;
+					}
+					break;
+				case 'greater_than':
+					if ( 'number' === $field_type ) {
+						$sub_wheres[] = "({$col_ref} + 0 > %f)";
+						$sub_values[] = (float) $val;
+					} else {
+						$sub_wheres[] = "({$col_ref} > %s)";
+						$sub_values[] = $val;
+					}
+					break;
+				case 'greater_than_equal':
+					if ( 'number' === $field_type ) {
+						$sub_wheres[] = "({$col_ref} + 0 >= %f)";
+						$sub_values[] = (float) $val;
+					} else {
+						$sub_wheres[] = "({$col_ref} >= %s)";
+						$sub_values[] = $val;
+					}
+					break;
+				case 'less_than':
+					if ( 'number' === $field_type ) {
+						$sub_wheres[] = "({$col_ref} + 0 < %f)";
+						$sub_values[] = (float) $val;
+					} else {
+						$sub_wheres[] = "({$col_ref} < %s)";
+						$sub_values[] = $val;
+					}
+					break;
+				case 'less_than_equal':
+					if ( 'number' === $field_type ) {
+						$sub_wheres[] = "({$col_ref} + 0 <= %f)";
+						$sub_values[] = (float) $val;
+					} else {
+						$sub_wheres[] = "({$col_ref} <= %s)";
+						$sub_values[] = $val;
+					}
+					break;
+			}
+		}
+
+		$where_str = '';
+		if ( ! empty( $sub_wheres ) ) {
+			$where_str = implode( ' AND ', $sub_wheres );
+		}
+
+		return array(
+			'where'  => $where_str,
+			'values' => $sub_values,
+		);
+	}
+
+	/**
 	 * Constructor: wires hooks.
 	 */
 	public function __construct() {
@@ -584,6 +775,17 @@ class MAF_REST {
 		if ( is_numeric( $age_max ) ) {
 			$where[]  = 'age <= %d';
 			$values[] = (int) $age_max;
+		}
+
+		// Advanced Dynamic Filters Integration (Single Source of Truth helper function)
+		$adv_filters = $request->get_param( 'adv_filters' );
+		if ( is_array( $adv_filters ) ) {
+			$form_id_param = (int) $request->get_param( 'form_id' );
+			$clauses       = self::build_advanced_filter_clauses( $adv_filters, $form_id_param, $wpdb );
+			if ( ! empty( $clauses['where'] ) ) {
+				$where[]  = '(' . $clauses['where'] . ')';
+				$values   = array_merge( $values, $clauses['values'] );
+			}
 		}
 
 		$search = $request->get_param( 'search' );

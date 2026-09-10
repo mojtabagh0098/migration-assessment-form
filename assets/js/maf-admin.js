@@ -65,7 +65,91 @@
 		[ 'maf-filter-form', 'maf-filter-language', 'maf-filter-status', 'maf-filter-country', 'maf-filter-search' ].forEach( function ( id ) {
 			document.getElementById( id ).addEventListener( 'change', updateExportLinks );
 		} );
+
+		var addBtn = document.getElementById( 'maf-add-filter-row' );
+		if ( addBtn ) {
+			addBtn.addEventListener( 'click', function () {
+				addFilterRow();
+			} );
+		}
+
+		var applyAdvBtn = document.getElementById( 'maf-apply-advanced-filters' );
+		if ( applyAdvBtn ) {
+			applyAdvBtn.addEventListener( 'click', function () {
+				state.page = 1;
+				fetchEntries();
+			} );
+		}
+
+		var resetBtn = document.getElementById( 'maf-reset-filters' );
+		if ( resetBtn ) {
+			resetBtn.addEventListener( 'click', function () {
+				document.getElementById( 'maf-filter-form' ).value = '';
+				document.getElementById( 'maf-filter-language' ).value = MAF_ADMIN_CONFIG.activeLang || '';
+				document.getElementById( 'maf-filter-status' ).value = '';
+				document.getElementById( 'maf-filter-country' ).value = '';
+				document.getElementById( 'maf-filter-search' ).value = '';
+				document.getElementById( 'maf-filter-rows-container' ).innerHTML = '';
+				state.page = 1;
+				fetchEntries();
+			} );
+		}
 	}
+
+
+	function addFilterRow( preselectedField, preselectedOp, preselectedVal ) {
+		var container = document.getElementById( 'maf-filter-rows-container' );
+		var row = document.createElement( 'div' );
+		row.className = 'maf-filter-row';
+
+		var fieldSelect = document.createElement( 'select' );
+		fieldSelect.className = 'maf-filter-field';
+		var formId = document.getElementById( 'maf-filter-form' ).value;
+		populateFieldSelect( fieldSelect, formId );
+		if ( preselectedField ) {
+			fieldSelect.value = preselectedField;
+		}
+
+		var opSelect = document.createElement( 'select' );
+		opSelect.className = 'maf-filter-op';
+
+		var valContainer = document.createElement( 'div' );
+		valContainer.className = 'maf-filter-val-container';
+		valContainer.style.display = 'inline-block';
+
+		var removeBtn = document.createElement( 'button' );
+		removeBtn.type = 'button';
+		removeBtn.className = 'button';
+		removeBtn.textContent = '×';
+		removeBtn.addEventListener( 'click', function () {
+			row.remove();
+			updateExportLinks();
+		} );
+
+		fieldSelect.addEventListener( 'change', function () {
+			updateOperators( row );
+			updateExportLinks();
+		} );
+
+		opSelect.addEventListener( 'change', function () {
+			updateValueInput( row );
+			updateExportLinks();
+		} );
+
+		row.appendChild( fieldSelect );
+		row.appendChild( opSelect );
+		row.appendChild( valContainer );
+		row.appendChild( removeBtn );
+
+		container.appendChild( row );
+
+		updateOperators( row, preselectedOp );
+		if ( preselectedVal !== undefined ) {
+			setValueInput( row, preselectedVal );
+		}
+		updateExportLinks();
+	}
+
 
 	/** Rebuilds the CSV/PDF export links so they carry the current filters. */
 	function updateExportLinks() {
@@ -75,6 +159,52 @@
 	}
 
 	/** @return {string} URL-encoded query string built from the visible filter controls. */
+	function populateFieldSelect( selectEl, formId ) {
+		selectEl.innerHTML = '<option value="">— Select field —</option>';
+		var schemas = MAF_ADMIN_CONFIG.schemas || {};
+		var fieldsMap = {};
+
+		if ( formId && schemas[ formId ] ) {
+			fieldsMap = schemas[ formId ];
+		} else {
+			Object.keys( schemas ).forEach( function ( fId ) {
+				var fMap = schemas[ fId ];
+				Object.keys( fMap ).forEach( function ( key ) {
+					if ( ! fieldsMap[ key ] ) {
+						fieldsMap[ key ] = fMap[ key ];
+					}
+				} );
+			} );
+		}
+
+		var generalFields = {
+			'first_name': { label: 'First Name', type: 'text' },
+			'last_name': { label: 'Last Name', type: 'text' },
+			'email': { label: 'Email', type: 'email' },
+			'phone': { label: 'Phone', type: 'tel_intl' },
+			'age': { label: 'Age', type: 'number' },
+			'country_residence': { label: 'Country of Residence', type: 'country' },
+			'country_citizenship': { label: 'Country of Citizenship', type: 'country' },
+			'marital_status': { label: 'Marital Status', type: 'select' },
+			'net_worth_cad': { label: 'Net Worth (CAD)', type: 'number' },
+			'status': { label: 'Status', type: 'select', options: { 'submitted': 'Submitted', 'conditional': 'Conditional', 'approved': 'Approved', 'rejected': 'Rejected' } },
+			'language': { label: 'Language', type: 'select', options: MAF_ADMIN_CONFIG.languages || {} }
+		};
+
+		var combined = Object.assign( {}, generalFields, fieldsMap );
+
+		Object.keys( combined ).forEach( function ( key ) {
+			var f = combined[ key ];
+			if ( f.type === 'file' || f.type === 'html' ) {
+				return;
+			}
+			var opt = document.createElement( 'option' );
+			opt.value = key;
+			opt.textContent = f.label || key;
+			selectEl.appendChild( opt );
+		} );
+	}
+
 	function buildFilterQuery() {
 		var params = new URLSearchParams();
 		var map = {
@@ -92,23 +222,132 @@
 		} );
 		return params.toString();
 	}
+		var rows = document.querySelectorAll( '.maf-filter-row' );
+		var advFilters = [];
+		rows.forEach( function ( row, index ) {
+			var field = row.querySelector( '.maf-filter-field' ).value;
+			var op = row.querySelector( '.maf-filter-op' ).value;
+			if ( ! field || ! op ) {
+				return;
+			}
+			params.set( 'adv_filters[' + index + '][field]', field );
+			params.set( 'adv_filters[' + index + '][op]', op );
+
+			if ( op === 'between' ) {
+				var val1 = row.querySelector( '.maf-filter-val1' ).value;
+				var val2 = row.querySelector( '.maf-filter-val2' ).value;
+				params.set( 'adv_filters[' + index + '][val1]', val1 );
+				params.set( 'adv_filters[' + index + '][val2]', val2 );
+			} else if ( op !== 'empty' && op !== 'not_empty' ) {
+				var val = row.querySelector( '.maf-filter-val' ).value;
+				params.set( 'adv_filters[' + index + '][val]', val );
+			}
+		} );
+
 
 	/** Fetches the filtered/paginated entries list and renders the table. */
-	function fetchEntries() {
-		var tbody = document.getElementById( 'maf-entries-tbody' );
-		tbody.innerHTML = '<tr><td colspan="8">' + MAF_ADMIN_CONFIG.i18n.loading + '</td></tr>';
+	function getFieldDef( fieldKey ) {
+		var formId = document.getElementById( 'maf-filter-form' ).value;
+		var schemas = MAF_ADMIN_CONFIG.schemas || {};
+		if ( formId && schemas[ formId ] && schemas[ formId ][ fieldKey ] ) {
+			return schemas[ formId ][ fieldKey ];
+		}
+		var found = null;
+		Object.keys( schemas ).forEach( function ( fId ) {
+			if ( schemas[ fId ][ fieldKey ] ) {
+				found = schemas[ fId ][ fieldKey ];
+			}
+		} );
+		if ( found ) {
+			return found;
+		}
 
-		var qs = buildFilterQuery();
-		qs += ( qs ? '&' : '' ) + 'page=' + state.page + '&per_page=' + state.perPage;
+		var generalFields = {
+			'first_name': { label: 'First Name', type: 'text' },
+			'last_name': { label: 'Last Name', type: 'text' },
+			'email': { label: 'Email', type: 'email' },
+			'phone': { label: 'Phone', type: 'tel_intl' },
+			'age': { label: 'Age', type: 'number' },
+			'country_residence': { label: 'Country of Residence', type: 'country' },
+			'country_citizenship': { label: 'Country of Citizenship', type: 'country' },
+			'marital_status': { label: 'Marital Status', type: 'select', options: { 'single': 'Single', 'married': 'Married', 'divorced': 'Divorced', 'widowed': 'Widowed' } },
+			'net_worth_cad': { label: 'Net Worth (CAD)', type: 'number' },
+			'status': { label: 'Status', type: 'select', options: { 'submitted': 'Submitted', 'conditional': 'Conditional', 'approved': 'Approved', 'rejected': 'Rejected' } },
+			'language': { label: 'Language', type: 'select', options: MAF_ADMIN_CONFIG.languages || {} }
+		};
 
-		fetch( MAF_ADMIN_CONFIG.restUrl + 'entries?' + qs, {
-			headers: { 'X-WP-Nonce': MAF_ADMIN_CONFIG.nonce },
-		} )
-			.then( function ( res ) { return res.json(); } )
-			.then( renderEntries )
-			.catch( function () {
-				tbody.innerHTML = '<tr><td colspan="8">' + MAF_ADMIN_CONFIG.i18n.error + '</td></tr>';
-			} );
+		return generalFields[ fieldKey ] || { type: 'text', label: fieldKey };
+	}
+
+	function updateOperators( row, preferredOp ) {
+		var fieldKey = row.querySelector( '.maf-filter-field' ).value;
+		var opSelect = row.querySelector( '.maf-filter-op' );
+		var fieldDef = getFieldDef( fieldKey );
+		var type = fieldDef.type || 'text';
+
+		opSelect.innerHTML = '';
+		var ops = [];
+
+		if ( [ 'text', 'textarea', 'email', 'tel_intl', 'url' ].indexOf( type ) !== -1 ) {
+			ops = [
+				{ value: 'contains', label: 'Contains' },
+				{ value: 'equals', label: 'Equals (=)' },
+				{ value: 'not_equals', label: 'Not equals (!=)' },
+				{ value: 'empty', label: 'Is empty' },
+				{ value: 'not_empty', label: 'Is not empty' }
+			];
+		} else if ( [ 'number', 'date' ].indexOf( type ) !== -1 ) {
+			ops = [
+				{ value: 'equals', label: 'Equals (=)' },
+				{ value: 'not_equals', label: 'Not equals (!=)' },
+				{ value: 'greater_than', label: 'Greater than (>)' },
+				{ value: 'greater_than_equal', label: 'Greater than or equal (>=)' },
+				{ value: 'less_than', label: 'Less than (<)' },
+				{ value: 'less_than_equal', label: 'Less than or equal (<=)' },
+				{ value: 'between', label: 'Between' },
+				{ value: 'empty', label: 'Is empty' },
+				{ value: 'not_empty', label: 'Is not empty' }
+			];
+		} else if ( [ 'select', 'radio', 'country', 'checkbox_group', 'checkbox' ].indexOf( type ) !== -1 ) {
+			ops = [
+				{ value: 'equals', label: 'Equals (=)' },
+				{ value: 'not_equals', label: 'Not equals (!=)' },
+				{ value: 'empty', label: 'Is empty' },
+				{ value: 'not_empty', label: 'Is not empty' }
+			];
+		} else {
+			ops = [
+				{ value: 'contains', label: 'Contains' },
+				{ value: 'equals', label: 'Equals (=)' }
+			];
+		}
+
+		ops.forEach( function ( op ) {
+			var opt = document.createElement( 'option' );
+			opt.value = op.value;
+			opt.textContent = op.label;
+			opSelect.appendChild( opt );
+		} );
+
+		if ( preferredOp ) {
+			opSelect.value = preferredOp;
+		}
+
+		updateValueInput( row );
+	}
+
+	function setValueInput( row, val ) {
+		var valEl = row.querySelector( '.maf-filter-val' );
+		if ( valEl ) {
+			valEl.value = val;
+			return;
+		}
+		var val1 = row.querySelector( '.maf-filter-val1' );
+		var val2 = row.querySelector( '.maf-filter-val2' );
+		if ( val1 && val2 && typeof val === 'object' ) {
+			val1.value = val.min || '';
+			val2.value = val.max || '';
+		}
 	}
 
 	/**

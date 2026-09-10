@@ -8,7 +8,7 @@
 
 .maf-toolbar select,
 .maf-toolbar input[type="text"] {
-	padding: 6px 8px 6px 30px;
+	/* padding: 6px 8px 6px 30px; */
 	border-radius: 4px;
 	border: 1px solid #8c8f94;
 }
@@ -88,3 +88,30 @@
 .maf-subtable { border-collapse: collapse; font-size: 12px; width: 100%; }
 .maf-subtable th, .maf-subtable td { border: 1px solid #e2e5e9; padding: 4px 6px; text-align: start; }
 .maf-subtable th { background: #f6f7f7; }
+
+.maf-advanced-filters-panel {
+	border-radius: 6px;
+}
+
+.maf-filter-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	margin-bottom: 8px;
+	background: #f9f9f9;
+	padding: 8px;
+	border: 1px solid #e2e5e9;
+	border-radius: 4px;
+}
+
+.maf-filter-row select,
+.maf-filter-row input[type="text"],
+.maf-filter-row input[type="number"],
+.maf-filter-row input[type="date"] {
+	padding: 4px 8px;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	font-size: 13px;
+}
+

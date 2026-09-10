@@ -50,6 +50,16 @@ class MAF_Export {
 				$values[] = sanitize_text_field( wp_unslash( $_GET[ $param ] ) );
 			}
 		}
+		// Advanced Dynamic Filters unification (Single Source of Truth)
+		if ( ! empty( $_GET['adv_filters'] ) && is_array( $_GET['adv_filters'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$form_id_param = ! empty( $_GET['form_id'] ) ? (int) $_GET['form_id'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$clauses       = MAF_REST::build_advanced_filter_clauses( $_GET['adv_filters'], $form_id_param, $wpdb ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( ! empty( $clauses['where'] ) ) {
+				$where[]  = '(' . $clauses['where'] . ')';
+				$values   = array_merge( $values, $clauses['values'] );
+			}
+		}
+
 
 		$sql = "SELECT * FROM {$table} WHERE " . implode( ' AND ', $where ) . ' ORDER BY created_at DESC';
 

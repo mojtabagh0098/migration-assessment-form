@@ -83,11 +83,11 @@
 		try {
 			var parsed = JSON.parse( raw );
 			if ( Array.isArray( parsed ) ) {
-				return { settings: { success_message: 'فرم با موفقیت ثبت شد. با تشکر!' }, sections: parsed };
+				return { settings: { success_message: 'The form was submitted successfully. Thank you!' }, sections: parsed };
 			}
 			if ( parsed && typeof parsed === 'object' && Array.isArray( parsed.sections ) ) {
 				if ( ! parsed.settings ) {
-					parsed.settings = { success_message: 'فرم با موفقیت ثبت شد. با تشکر!' };
+					parsed.settings = { success_message: 'The form was submitted successfully. Thank you!' };
 				}
 				return parsed;
 			}
@@ -550,7 +550,7 @@
 			el( 'button', { type: 'button', class: 'button', onClick: function () {
 				if ( window.confirm( I18N.confirmReset ) ) {
 					commit();
-					schema = parseSchema( root.dataset.defaultSchema ) || { settings: { success_message: 'فرم با موفقیت ثبت شد. با تشکر!' }, sections: [] };
+					schema = parseSchema( root.dataset.defaultSchema ) || { settings: { success_message: 'The form was submitted successfully. Thank you!' }, sections: [] };
 					selected = null;
 					render();
 					sync();

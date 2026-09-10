@@ -279,6 +279,10 @@ class MAF_Admin {
 				'exportCsvUrl' => wp_nonce_url( admin_url( 'admin-post.php?action=maf_export_csv' ), 'maf_export' ),
 				'exportPdfUrl' => wp_nonce_url( admin_url( 'admin-post.php?action=maf_export_pdf' ), 'maf_export' ),
 				'forms'        => $form_options,
+				'schemas'      => array_reduce( $forms, function ( $acc, $form ) {
+					$acc[ $form->ID ] = MAF_Fields::flatten( MAF_Fields::get_schema( $form->ID ) );
+					return $acc;
+				}, array() ),
 				'activeLang'   => MAF_WPML::admin_active_language(),
 				'languages'    => MAF_WPML::active_languages(),
 				'i18n'         => array(
@@ -291,6 +295,7 @@ class MAF_Admin {
 			)
 		);
 	}
+
 
 	/**
 	 * Renders the Entries admin page shell. All data-fetching/rendering
@@ -328,6 +333,18 @@ class MAF_Admin {
 				<a class="button" id="maf-export-csv" target="_blank"><?php esc_html_e( 'Export CSV', 'migration-assessment-form' ); ?></a>
 				<a class="button" id="maf-export-pdf" target="_blank"><?php esc_html_e( 'Export PDF', 'migration-assessment-form' ); ?></a>
 			</div>
+			<div class="maf-advanced-filters-panel" id="maf-advanced-filters-panel" style="margin-bottom: 15px; background: #fff; border: 1px solid #ccd0d4; padding: 15px; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+					<strong style="font-size: 14px;"><?php esc_html_e( 'Advanced Dynamic Filters', 'migration-assessment-form' ); ?></strong>
+					<button type="button" class="button button-secondary" id="maf-add-filter-row">+ <?php esc_html_e( 'Add Filter', 'migration-assessment-form' ); ?></button>
+				</div>
+				<div id="maf-filter-rows-container"></div>
+				<div style="margin-top: 10px; display: flex; gap: 10px;">
+					<button type="button" class="button button-primary" id="maf-apply-advanced-filters"><?php esc_html_e( 'Apply Advanced Filters', 'migration-assessment-form' ); ?></button>
+					<button type="button" class="button" id="maf-reset-filters"><?php esc_html_e( 'Reset All', 'migration-assessment-form' ); ?></button>
+				</div>
+			</div>
+
 
 			<table class="wp-list-table widefat fixed striped">
 				<thead>
