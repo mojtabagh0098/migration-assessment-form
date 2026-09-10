@@ -336,7 +336,7 @@
 			return;
 		}
 		commit();
-		var target = selected.type === 'section' ? schema[ selected.s ] : schema[ selected.s ].fields[ selected.f ];
+		var target = selected.type === 'section' ? schema.sections[ selected.s ] : schema.sections[ selected.s ].fields[ selected.f ];
 		mutator( target );
 		renderCanvas();
 		renderHeader();
@@ -445,7 +445,8 @@
 		if ( ! header ) {
 			return;
 		}
-		var nFields = schema.reduce( function ( n, s ) { return n + s.fields.length; }, 0 );
+		var sectionsList = Array.isArray( schema ) ? schema : ( schema.sections || [] );
+		var nFields = sectionsList.reduce( function ( n, s ) { return n + ( s.fields ? s.fields.length : 0 ); }, 0 );
 		header.innerHTML = '';
 
 		var tabs = el( 'div', { class: 'maf-b-tabs', role: 'tablist' } );
@@ -768,7 +769,7 @@
 			] ),
 			el( 'div', { class: 'maf-b-section__actions' }, [
 				el( 'button', { type: 'button', class: 'maf-b-iconbtn', title: I18N.moveUp, disabled: sIdx === 0, onClick: function () { moveSection( sIdx, sIdx - 1 ); } }, [ icon( 'arrow-up-alt2' ) ] ),
-				el( 'button', { type: 'button', class: 'maf-b-iconbtn', title: I18N.moveDown, disabled: sIdx === schema.length - 1, onClick: function () { moveSection( sIdx, sIdx + 1 ); } }, [ icon( 'arrow-down-alt2' ) ] ),
+				el( 'button', { type: 'button', class: 'maf-b-iconbtn', title: I18N.moveDown, disabled: sIdx === schema.sections.length - 1, onClick: function () { moveSection( sIdx, sIdx + 1 ); } }, [ icon( 'arrow-down-alt2' ) ] ),
 				el( 'button', { type: 'button', class: 'maf-b-iconbtn', title: I18N.duplicate, onClick: function () { selected = { type: 'section', s: sIdx }; duplicateSelected(); } }, [ icon( 'admin-page' ) ] ),
 				el( 'button', { type: 'button', class: 'maf-b-iconbtn is-danger', title: I18N.delete, onClick: function () { selected = { type: 'section', s: sIdx }; deleteSelected(); } }, [ icon( 'trash' ) ] ),
 				el( 'button', { type: 'button', class: 'maf-b-iconbtn', title: I18N.collapse, onClick: function () { collapsed[ sec.id ] = ! isCollapsed; renderCanvas(); } }, [ icon( isCollapsed ? 'arrow-down-alt2' : 'arrow-up-alt2' ) ] ),
@@ -941,16 +942,16 @@
 		}
 		pane.innerHTML = '';
 
-		if ( ! selected || ! schema[ selected.s ] || ( selected.type === 'field' && ! schema[ selected.s ].fields[ selected.f ] ) ) {
+		if ( ! selected || ! schema.sections[ selected.s ] || ( selected.type === 'field' && ! schema.sections[ selected.s ].fields[ selected.f ] ) ) {
 			selected = null;
 			pane.appendChild( el( 'div', { class: 'maf-b-inspector__empty' }, [ icon( 'admin-generic' ), el( 'p', { text: I18N.selectField } ) ] ) );
 			return;
 		}
 
 		if ( selected.type === 'section' ) {
-			renderSectionInspector( pane, schema[ selected.s ] );
+			renderSectionInspector( pane, schema.sections[ selected.s ] );
 		} else {
-			renderFieldInspector( pane, schema[ selected.s ].fields[ selected.f ], selected.s );
+			renderFieldInspector( pane, schema.sections[ selected.s ].fields[ selected.f ], selected.s );
 		}
 	}
 
@@ -1323,10 +1324,10 @@
 				}
 			} );
 		};
-		if ( schema[ sIdx ].repeater ) {
-			pushFrom( schema[ sIdx ] );
+		if ( schema.sections[ sIdx ].repeater ) {
+			pushFrom( schema.sections[ sIdx ] );
 		} else {
-			schema.forEach( function ( s ) { if ( ! s.repeater ) { pushFrom( s ); } } );
+			schema.sections.forEach( function ( s ) { if ( ! s.repeater ) { pushFrom( s ); } } );
 		}
 
 		box.appendChild( toggle( I18N.conditionalEnable, !! field.condition, function ( on ) {
@@ -1426,7 +1427,7 @@
 		var canvasWrap = el( 'div', { class: 'maf-b-preview__canvas-wrap maf-b-preview__canvas-wrap--desktop' } );
 		var form = el( 'div', { class: 'maf-form maf-b-preview__form', dir: MAF_BUILDER.isRtl ? 'rtl' : 'ltr' } );
 
-		schema.forEach( function ( sec ) {
+		schema.sections.forEach( function ( sec ) {
 			var card = el( 'section', { class: 'maf-card' } );
 			card.appendChild( el( 'h3', { class: 'maf-card__title', text: sec.title } ) );
 			if ( sec.description ) {
