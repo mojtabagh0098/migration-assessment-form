@@ -332,7 +332,47 @@
 		renderCanvas();
 		renderHeader();
 		if ( rerenderInspector ) {
+			// Save the currently focused element's selector so we can restore
+			// focus (and caret position) after re-building the inspector DOM.
+			var focusInfo = null;
+			var ae = document.activeElement;
+			if ( ae && ae.closest && ae.closest( '.maf-b-inspector' ) ) {
+				var selStart = null, selEnd = null;
+				try { selStart = ae.selectionStart; selEnd = ae.selectionEnd; } catch ( ignore ) { /* number inputs may throw */ }
+				focusInfo = {
+					tag:   ae.tagName,
+					title: ae.title || '',
+					dataKey: ae.getAttribute( 'data-key' ) || '',
+					start: selStart,
+					end:   selEnd,
+				};
+			}
+
 			renderInspector();
+
+			// Restore focus.
+			if ( focusInfo ) {
+				var inspector = document.querySelector( '.maf-b-inspector' );
+				if ( inspector ) {
+					var candidates = inspector.querySelectorAll( focusInfo.tag );
+					for ( var i = 0; i < candidates.length; i++ ) {
+						var c = candidates[ i ];
+						var match = false;
+						if ( focusInfo.title && c.title === focusInfo.title ) {
+							match = true;
+						} else if ( focusInfo.dataKey && c.getAttribute( 'data-key' ) === focusInfo.dataKey ) {
+							match = true;
+						}
+						if ( match ) {
+							c.focus();
+							if ( focusInfo.start !== null ) {
+								try { c.setSelectionRange( focusInfo.start, focusInfo.end ); } catch ( ignore ) { /* type may not support */ }
+							}
+							break;
+						}
+					}
+				}
+			}
 		}
 		sync();
 	}
