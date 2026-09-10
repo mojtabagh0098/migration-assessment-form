@@ -25,6 +25,7 @@
 /* Hide the default sidebar (Publish, Shortcode boxes are now in the builder header). */
 .post-type-maf_form #poststuff #post-body.columns-2 {
 	margin-right: 0;
+	margin-left: 0;
 }
 .post-type-maf_form #poststuff #post-body-content {
 	width: 100%;
@@ -138,7 +139,7 @@
 /* Body / three panes                                                  */
 /* ------------------------------------------------------------------ */
 
-.maf-b-body { flex: 1; display: grid; grid-template-columns: 240px minmax(0, 1fr) 320px; min-height: 0; }
+.maf-b-body { flex: 1; display: grid; grid-template-columns: 240px minmax(0, 1fr) 375px; min-height: 0; }
 .maf-b-body--preview,
 .maf-b-body--json { display: block; }
 
