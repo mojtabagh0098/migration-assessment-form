@@ -486,7 +486,7 @@
 				submitBtn.disabled = false;
 				form.classList.remove( 'is-submitting' );
 				if ( result.ok ) {
-					statusEl.textContent = MAF_CONFIG.i18n.success;
+					statusEl.textContent = form.dataset.successMessage || MAF_CONFIG.i18n.success;
 					statusEl.classList.add( 'maf-success' );
 					form.reset();
 					form.querySelectorAll( 'input[type="file"]' ).forEach( function ( input ) {

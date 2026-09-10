@@ -338,7 +338,12 @@ class MAF_Fields {
 		}
 		unset( $section, $field );
 
-		return $schema;
+		return array(
+			'settings' => array(
+				'success_message' => __( 'The form was submitted successfully. Thank you!', 'migration-assessment-form' ),
+			),
+			'sections' => $schema,
+		);
 	}
 
 	/**
@@ -497,12 +502,33 @@ class MAF_Fields {
 	 */
 	public static function sanitize_schema( $schema ) {
 		$types      = self::field_types();
-		$clean      = array();
+		
+		// Handle settings
+		$clean_settings = array(
+			'success_message' => __( 'The form was submitted successfully. Thank you!', 'migration-assessment-form' ),
+		);
+		
+		$raw_sections = array();
+		if ( is_array( $schema ) ) {
+			if ( isset( $schema['sections'] ) && is_array( $schema['sections'] ) ) {
+				if ( isset( $schema['settings'] ) && is_array( $schema['settings'] ) ) {
+					if ( isset( $schema['settings']['success_message'] ) ) {
+						$clean_settings['success_message'] = sanitize_text_field( $schema['settings']['success_message'] );
+					}
+				}
+				$raw_sections = $schema['sections'];
+			} else {
+				// Legacy format: numeric array of sections
+				$raw_sections = $schema;
+			}
+		}
+
+		$clean_sections = array();
 		$used_keys  = array();
 		$used_ids   = array();
 		$section_no = 0;
 
-		foreach ( (array) $schema as $section ) {
+		foreach ( (array) $raw_sections as $section ) {
 			if ( ! is_array( $section ) ) {
 				continue;
 			}
@@ -680,10 +706,13 @@ class MAF_Fields {
 			}
 
 			unset( $scope_keys );
-			$clean[] = $clean_section;
+			$clean_sections[] = $clean_section;
 		}
 
-		return $clean;
+		return array(
+			'settings' => $clean_settings,
+			'sections' => $clean_sections,
+		);
 	}
 
 	/**
@@ -739,6 +768,14 @@ class MAF_Fields {
 		if ( ! empty( $raw ) ) {
 			$decoded = json_decode( $raw, true );
 			if ( JSON_ERROR_NONE === json_last_error() && is_array( $decoded ) ) {
+				// If legacy format (numeric array of sections), normalize it
+				if ( isset( $decoded[0] ) || empty( $decoded['sections'] ) ) {
+					$default = self::default_schema();
+					return array(
+						'settings' => $default['settings'],
+						'sections' => $decoded,
+					);
+				}
 				return $decoded;
 			}
 		}
@@ -755,8 +792,9 @@ class MAF_Fields {
 	 */
 	public static function flatten( $schema ) {
 		$flat = array();
-		foreach ( $schema as $section ) {
-			if ( empty( $section['fields'] ) ) {
+		$sections = isset( $schema['sections'] ) && is_array( $schema['sections'] ) ? $schema['sections'] : $schema;
+		foreach ( (array) $sections as $section ) {
+			if ( ! is_array( $section ) || empty( $section['fields'] ) ) {
 				continue;
 			}
 			foreach ( $section['fields'] as $field ) {

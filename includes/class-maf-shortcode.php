@@ -78,12 +78,14 @@ class MAF_Shortcode {
 
 		$this->enqueue_assets();
 
-		$schema = MAF_Fields::get_schema( $form_id );
+		$schema         = MAF_Fields::get_schema( $form_id );
+		$success_message = $schema['settings']['success_message'] ?? '';
+		$sections       = $schema['sections'] ?? $schema;
 
 		ob_start();
 		?>
-		<form class="maf-form" id="maf-form-<?php echo esc_attr( $form_id ); ?>" data-form-id="<?php echo esc_attr( $form_id ); ?>" enctype="multipart/form-data" novalidate>
-			<?php foreach ( $schema as $section ) : ?>
+		<form class="maf-form" id="maf-form-<?php echo esc_attr( $form_id ); ?>" data-form-id="<?php echo esc_attr( $form_id ); ?>"<?php echo ! empty( $success_message ) ? ' data-success-message="' . esc_attr( $success_message ) . '"' : ''; ?> enctype="multipart/form-data" novalidate>
+			<?php foreach ( $sections as $section ) : ?>
 				<section class="maf-card" data-section="<?php echo esc_attr( $section['id'] ); ?>">
 					<h3 class="maf-card__title"><?php echo esc_html( $section['title'] ); ?></h3>
 					<?php if ( ! empty( $section['description'] ) ) : ?>

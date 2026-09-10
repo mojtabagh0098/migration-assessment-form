@@ -82,7 +82,16 @@
 	function parseSchema( raw ) {
 		try {
 			var parsed = JSON.parse( raw );
-			return Array.isArray( parsed ) ? parsed : null;
+			if ( Array.isArray( parsed ) ) {
+				return { settings: { success_message: 'فرم با موفقیت ثبت شد. با تشکر!' }, sections: parsed };
+			}
+			if ( parsed && typeof parsed === 'object' && Array.isArray( parsed.sections ) ) {
+				if ( ! parsed.settings ) {
+					parsed.settings = { success_message: 'فرم با موفقیت ثبت شد. با تشکر!' };
+				}
+				return parsed;
+			}
+			return null;
 		} catch ( e ) {
 			return null;
 		}
@@ -153,7 +162,7 @@
 	/** Keys in the same validation scope (global for normal sections, per-section for repeaters). */
 	function scopeKeys( sIdx, excludeF ) {
 		var keys = [];
-		var sec = schema[ sIdx ];
+		var sec = schema.sections[ sIdx ];
 		if ( sec.repeater ) {
 			sec.fields.forEach( function ( f, i ) {
 				if ( i !== excludeF ) {
@@ -162,7 +171,7 @@
 			} );
 			return keys;
 		}
-		schema.forEach( function ( s, si ) {
+		schema.sections.forEach( function ( s, si ) {
 			if ( s.repeater ) {
 				return;
 			}
@@ -204,7 +213,7 @@
 			sec.repeater  = true;
 			sec.row_label = I18N.newRepeater;
 		}
-		var ids = schema.map( function ( s ) { return s.id; } );
+		var ids = schema.sections.map( function ( s ) { return s.id; } );
 		sec.id = uniqueKey( slugify( sec.title ) || 'section', ids );
 		return sec;
 	}
@@ -217,10 +226,10 @@
 		commit();
 		var sec = makeSection( repeater );
 		if ( typeof atIndex === 'number' ) {
-			schema.splice( atIndex, 0, sec );
+			schema.sections.splice( atIndex, 0, sec );
 		} else {
-			schema.push( sec );
-			atIndex = schema.length - 1;
+			schema.sections.push( sec );
+			atIndex = schema.sections.length - 1;
 		}
 		selected = { type: 'section', s: atIndex };
 		render();
@@ -228,34 +237,34 @@
 	}
 
 	function addField( type, sIdx, atIndex ) {
-		if ( ! schema.length ) {
+		if ( ! schema.sections.length ) {
 			addSection( false );
 			sIdx = 0;
 		}
 		if ( typeof sIdx !== 'number' ) {
-			sIdx = selected ? selected.s : schema.length - 1;
+			sIdx = selected ? selected.s : schema.sections.length - 1;
 		}
 		commit();
 		var field = makeField( type );
 		field.key = uniqueKey( slugify( field.label ) || type, scopeKeys( sIdx ) );
-		var list  = schema[ sIdx ].fields;
+		var list  = schema.sections[ sIdx ].fields;
 		if ( typeof atIndex !== 'number' ) {
 			atIndex = list.length;
 		}
 		list.splice( atIndex, 0, field );
-		collapsed[ schema[ sIdx ].id ] = false;
+		collapsed[ schema.sections[ sIdx ].id ] = false;
 		selected = { type: 'field', s: sIdx, f: atIndex };
 		render();
 		sync();
 	}
 
 	function moveSection( from, to ) {
-		if ( from === to || to < 0 || to >= schema.length ) {
+		if ( from === to || to < 0 || to >= schema.sections.length ) {
 			return;
 		}
 		commit();
-		var item = schema.splice( from, 1 )[0];
-		schema.splice( to, 0, item );
+		var item = schema.sections.splice( from, 1 )[0];
+		schema.sections.splice( to, 0, item );
 		selected = { type: 'section', s: to };
 		render();
 		sync();
@@ -263,14 +272,14 @@
 
 	function moveField( fromS, fromF, toS, toF ) {
 		commit();
-		var item = schema[ fromS ].fields.splice( fromF, 1 )[0];
+		var item = schema.sections[ fromS ].fields.splice( fromF, 1 )[0];
 		if ( fromS === toS && fromF < toF ) {
 			toF--;
 		}
-		toF = Math.max( 0, Math.min( toF, schema[ toS ].fields.length ) );
+		toF = Math.max( 0, Math.min( toF, schema.sections[ toS ].fields.length ) );
 		// Avoid key clashes when moving between scopes.
 		item.key = uniqueKey( item.key, scopeKeys( toS ) );
-		schema[ toS ].fields.splice( toF, 0, item );
+		schema.sections[ toS ].fields.splice( toF, 0, item );
 		selected = { type: 'field', s: toS, f: toF };
 		render();
 		sync();
@@ -282,9 +291,9 @@
 		}
 		commit();
 		if ( selected.type === 'section' ) {
-			var sec = clone( schema[ selected.s ] );
-			sec.id = uniqueKey( sec.id, schema.map( function ( s ) { return s.id; } ) );
-			schema.splice( selected.s + 1, 0, sec );
+			var sec = clone( schema.sections[ selected.s ] );
+			sec.id = uniqueKey( sec.id, schema.sections.map( function ( s ) { return s.id; } ) );
+			schema.sections.splice( selected.s + 1, 0, sec );
 			// Re-key fields if global scope.
 			if ( ! sec.repeater ) {
 				sec.fields.forEach( function ( f, i ) {
@@ -293,8 +302,8 @@
 			}
 			selected = { type: 'section', s: selected.s + 1 };
 		} else {
-			var fld = clone( schema[ selected.s ].fields[ selected.f ] );
-			schema[ selected.s ].fields.splice( selected.f + 1, 0, fld );
+			var fld = clone( schema.sections[ selected.s ].fields[ selected.f ] );
+			schema.sections[ selected.s ].fields.splice( selected.f + 1, 0, fld );
 			fld.key = uniqueKey( fld.key, scopeKeys( selected.s, selected.f + 1 ) );
 			selected = { type: 'field', s: selected.s, f: selected.f + 1 };
 		}
@@ -312,9 +321,9 @@
 		}
 		commit();
 		if ( selected.type === 'section' ) {
-			schema.splice( selected.s, 1 );
+			schema.sections.splice( selected.s, 1 );
 		} else {
-			schema[ selected.s ].fields.splice( selected.f, 1 );
+			schema.sections[ selected.s ].fields.splice( selected.f, 1 );
 		}
 		selected = null;
 		render();
@@ -440,7 +449,7 @@
 		header.innerHTML = '';
 
 		var tabs = el( 'div', { class: 'maf-b-tabs', role: 'tablist' } );
-		[ [ 'builder', I18N.tabBuilder, 'layout' ], [ 'preview', I18N.tabPreview, 'visibility' ], [ 'json', I18N.tabJson, 'editor-code' ] ].forEach( function ( t ) {
+		[ [ 'builder', I18N.tabBuilder, 'layout' ], [ 'preview', I18N.tabPreview, 'visibility' ], [ 'settings', I18N.tabSettings || 'Settings', 'admin-settings' ], [ 'json', I18N.tabJson, 'editor-code' ] ].forEach( function ( t ) {
 			tabs.appendChild( el( 'button', {
 				type: 'button', role: 'tab', class: 'maf-b-tab' + ( activeTab === t[0] ? ' is-active' : '' ),
 				onClick: function () {
@@ -457,7 +466,7 @@
 		header.appendChild( tabs );
 
 		header.appendChild( el( 'div', { class: 'maf-b-stats' }, [
-			el( 'span', { text: I18N.statsSections.replace( '%d', schema.length ) } ),
+			el( 'span', { text: I18N.statsSections.replace( '%d', schema.sections.length ) } ),
 			el( 'span', { text: I18N.statsFields.replace( '%d', nFields ) } ),
 			dirty ? el( 'span', { class: 'maf-b-dirty', text: I18N.unsaved } ) : null,
 		] ) );
@@ -540,7 +549,7 @@
 			el( 'button', { type: 'button', class: 'button', onClick: function () {
 				if ( window.confirm( I18N.confirmReset ) ) {
 					commit();
-					schema = parseSchema( root.dataset.defaultSchema ) || [];
+					schema = parseSchema( root.dataset.defaultSchema ) || { settings: { success_message: 'فرم با موفقیت ثبت شد. با تشکر!' }, sections: [] };
 					selected = null;
 					render();
 					sync();
@@ -560,6 +569,10 @@
 			body.appendChild( renderPreview() );
 			return;
 		}
+		if ( activeTab === 'settings' ) {
+			body.appendChild( renderSettingsTab() );
+			return;
+		}
 		if ( activeTab === 'json' ) {
 			body.appendChild( renderJsonTab() );
 			return;
@@ -570,6 +583,33 @@
 		body.appendChild( el( 'aside', { class: 'maf-b-inspector', id: 'maf-b-inspector' } ) );
 		renderCanvas();
 		renderInspector();
+	}
+
+	function renderSettingsTab() {
+		var pane = el( 'div', { class: 'maf-b-settings-tab' } );
+		pane.appendChild( el( 'h2', { text: I18N.tabSettings || 'Form Settings' } ) );
+		pane.appendChild( el( 'p', { class: 'description', text: I18N.settingsDesc || 'Configure global settings for this assessment form.' } ) );
+
+		var group = el( 'div', { class: 'maf-b-field' } );
+		group.appendChild( el( 'label', { text: I18N.successMessageLabel || 'Success Message (shown after form submission)' } ) );
+		
+		var input = el( 'textarea', {
+			rows: 4,
+			class: 'large-text',
+			value: ( schema.settings && schema.settings.success_message ) || ''
+		} );
+		input.addEventListener( 'input', function () {
+			if ( ! schema.settings ) {
+				schema.settings = {};
+			}
+			schema.settings.success_message = input.value;
+			commit();
+			sync();
+		} );
+		group.appendChild( input );
+		pane.appendChild( group );
+
+		return pane;
 	}
 
 	/* ---------------------------- Palette ---------------------------- */
@@ -626,7 +666,7 @@
 		var canvas = el( 'div', { class: 'maf-b-canvas' } );
 		wrap.appendChild( canvas );
 
-		if ( ! schema.length ) {
+		if ( ! schema.sections.length ) {
 			var empty = el( 'div', { class: 'maf-b-empty' }, [
 				icon( 'welcome-widgets-menus' ),
 				el( 'p', { text: I18N.emptyForm } ),
@@ -637,11 +677,11 @@
 			return;
 		}
 
-		schema.forEach( function ( sec, sIdx ) {
+		schema.sections.forEach( function ( sec, sIdx ) {
 			canvas.appendChild( sectionDropZone( sIdx ) );
 			canvas.appendChild( renderSectionCard( sec, sIdx ) );
 		} );
-		canvas.appendChild( sectionDropZone( schema.length ) );
+		canvas.appendChild( sectionDropZone( schema.sections.length ) );
 
 		canvas.appendChild( el( 'div', { class: 'maf-b-canvas__footer' }, [
 			el( 'button', { type: 'button', class: 'button', onClick: function () { addSection( false ); } }, [ icon( 'plus-alt2' ), I18N.addSection ] ),
