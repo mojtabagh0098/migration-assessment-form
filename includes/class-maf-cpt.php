@@ -320,4 +320,8 @@ class MAF_CPT {
 			echo esc_html( MAF_WPML::translation_status_label( $post_id ) );
 		}
 	}
+		if ( 'maf_status' === $column ) {
+			echo 'Status';
+		}
+
 }

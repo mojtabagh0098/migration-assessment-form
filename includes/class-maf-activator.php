@@ -73,6 +73,11 @@ class MAF_Activator {
 			country_residence VARCHAR(120) DEFAULT '',
 			country_citizenship VARCHAR(120) DEFAULT '',
 			marital_status VARCHAR(60) DEFAULT '',
+			importance VARCHAR(30) NOT NULL DEFAULT 'Normal',
+			step VARCHAR(50) NOT NULL DEFAULT 'Assessment',
+			program_type VARCHAR(100) NOT NULL DEFAULT 'none',
+			assigned_by BIGINT UNSIGNED DEFAULT NULL,
+			assigned_to BIGINT UNSIGNED DEFAULT NULL,
 			net_worth_cad DECIMAL(14,2) DEFAULT NULL,
 			data LONGTEXT NOT NULL,
 			ip_address VARCHAR(64) DEFAULT '',
@@ -87,6 +92,11 @@ class MAF_Activator {
 			KEY age (age),
 			KEY marital_status (marital_status),
 			KEY email (email),
+			KEY importance (importance),
+			KEY step (step),
+			KEY program_type (program_type),
+			KEY assigned_by (assigned_by),
+			KEY assigned_to (assigned_to),
 			KEY created_at (created_at)
 		) {$charset_collate};";
 
