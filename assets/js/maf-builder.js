@@ -880,7 +880,7 @@
 			update( function ( f ) {
 				var fresh = makeField( typeSel.value );
 				// Preserve common attributes, reset type-specific ones.
-				[ 'key', 'label', 'required', 'placeholder', 'help', 'width', 'condition' ].forEach( function ( k ) {
+				[ 'key', 'label', 'required', 'placeholder', 'help', 'width', 'widths', 'condition' ].forEach( function ( k ) {
 					if ( f[ k ] !== undefined ) {
 						fresh[ k ] = f[ k ];
 					}
@@ -934,20 +934,74 @@
 		}
 		pane.appendChild( toggles );
 
-		// Width.
-		var widthWrap = el( 'div', { class: 'maf-b-segmented' } );
-		[ [ 'full', I18N.widthFull ], [ 'half', I18N.widthHalf ], [ 'third', I18N.widthThird ] ].forEach( function ( w ) {
-			widthWrap.appendChild( el( 'button', { type: 'button', class: ( field.width || 'full' ) === w[0] ? 'is-active' : '', onClick: function () {
-				update( function ( f ) { w[0] === 'full' ? delete f.width : f.width = w[0]; }, true );
-			} }, [ w[1] ] ) );
-		} );
-		pane.appendChild( control( I18N.width, widthWrap ) );
+		// Responsive Width settings.
+		if ( ! def.static ) {
+			var rwGroup = el( 'div', { class: 'maf-b-group' } );
+			rwGroup.appendChild( el( 'h4', { text: I18N.width } ) );
+			
+			var breakpoints = [
+				{ key: 'desktop', label: I18N.widthDesktop, minW: 1400 },
+				{ key: 'laptop', label: I18N.widthLaptop, minW: 1024 },
+				{ key: 'tablet', label: I18N.widthTablet, minW: 768 },
+				{ key: 'mobile', label: I18N.widthMobile, minW: 0 }
+			];
+			
+			// Ensure widths object exists; merge with legacy width.
+			var widths = field.widths || {};
+			breakpoints.forEach( function ( bp ) {
+				if ( ! widths[ bp.key ] ) {
+					widths[ bp.key ] = { preset: '', pct: '' };
+				}
+				var wp = widths[ bp.key ];
+				
+				// Label row for breakpoint.
+				var bw = el( 'div', { class: 'maf-b-rw-breakpoint' } );
+				
+				// Preset dropdown.
+				var presets = [
+					{ val: '', label: I18N.widthInherit },
+					{ val: 'full', label: I18N.widthFull },
+					{ val: 'half', label: I18N.widthHalf },
+					{ val: 'third', label: I18N.widthThird }
+				];
+				var presetSel = el( 'select', { class: 'maf-b-rw-preset small-text', 'data-key': bp.key, title: bp.label + ' — ' + I18N.preset } );
+				presets.forEach( function ( p ) {
+					presetSel.appendChild( el( 'option', { value: p.val, selected: wp.preset === p.val, text: p.label } ) );
+				} );
+				presetSel.addEventListener( 'change', function () {
+					update( function ( f ) {
+						if ( ! f.widths ) f.widths = {};
+						if ( ! f.widths[ bp.key ] ) f.widths[ bp.key ] = { preset: '', pct: '' };
+						f.widths[ bp.key ].preset = presetSel.value;
+						if ( presetSel.value === '' ) { delete f.widths[ bp.key ].pct; }
+						// Keep legacy width in sync with desktop preset.
+						if ( bp.key === 'desktop' && presetSel.value ) {
+							f.width = presetSel.value;
+						}
+					}, true );
+				} );
+				
+				// Percentage input.
+				var pctInput = textInput( wp.pct || '', function ( v ) {
+					update( function ( f ) {
+						if ( ! f.widths ) f.widths = {};
+						if ( ! f.widths[ bp.key ] ) f.widths[ bp.key ] = { preset: '', pct: '' };
+						v === '' ? delete f.widths[ bp.key ].pct : f.widths[ bp.key ].pct = Math.min( 100, Math.max( 1, parseInt( v, 10 ) ) || '' );
+					}, true );
+				}, { type: 'number', min: 1, max: 100, class: 'small-text', title: bp.label + ' — %' } );
+				pctInput.style.maxWidth = '80px';
+				
+				bw.appendChild( el( 'span', { class: 'maf-b-rw-label', text: bp.label } ) );
+				bw.appendChild( el( 'div', { style: 'display:flex;gap:6px;align-items:center;' }, [ presetSel, el( 'label', { class: 'maf-b-rw-pct-label', text: '%' }, [ pctInput ] ) ] ) );
+				rwGroup.appendChild( bw );
+			} );
+			pane.appendChild( rwGroup );
+		}
 
 		// Numeric constraints.
-		// New: Custom width (%), class, ID
+		// Custom ID & Class only
 		if ( ! def.static ) {
 			var customRow = el( 'div', { class: 'maf-b-row' } );
-			customRow.appendChild( control( 'Width (%)', textInput( field.width_pc || '', function ( v ) { update( function ( f ) { v === '' ? delete f.width_pc : f.width_pc = parseInt( v, 10 ) || ''; } ); }, { type: 'number', min: 1, max: 100, class: 'small-text' } ) ) );
 			customRow.appendChild( control( 'Element ID', textInput( field.custom_id || '', function ( v ) { update( function ( f ) { v ? f.custom_id = v.replace(/[^a-z0-9_-]/gi, '') : delete f.custom_id; } ); }, { class: 'small-text code' } ) ) );
 			pane.appendChild( customRow );
 			pane.appendChild( control( 'CSS Class', textInput( field.custom_class || '', function ( v ) { update( function ( f ) { v ? f.custom_class = v : delete f.custom_class; } ); } ) ) );
@@ -1191,7 +1245,31 @@
 
 	function renderPreview() {
 		var wrap = el( 'div', { class: 'maf-b-preview' } );
-		wrap.appendChild( el( 'p', { class: 'maf-b-preview__note' }, [ icon( 'info-outline' ), I18N.previewNote ] ) );
+		var headerRow = el( 'div', { style: 'display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;' } );
+		headerRow.appendChild( el( 'p', { class: 'maf-b-preview__note', style: 'margin:0;' }, [ icon( 'info-outline' ), I18N.previewNote ] ) );
+		
+		// Device size toggle.
+		var devices = el( 'div', { class: 'maf-b-preview__devices' } );
+		var deviceModes = [
+			{ key: 'desktop', label: I18N.widthDesktop, icon: 'desktop', cls: '--desktop' },
+			{ key: 'laptop', label: I18N.widthLaptop, icon: 'screenresolution', cls: '--laptop' },
+			{ key: 'tablet', label: I18N.widthTablet, icon: 'admin-site-alt3', cls: '--tablet' },
+			{ key: 'mobile', label: I18N.widthMobile, icon: 'smartphone', cls: '--mobile' }
+		];
+		var currentDevice = 'desktop';
+		deviceModes.forEach( function ( dm ) {
+			var btn = el( 'button', { type: 'button', class: 'maf-b-preview__device-btn' + ( dm.key === currentDevice ? ' is-active' : ''), title: dm.label, onClick: function () {
+				deviceModes.forEach( function ( d ) { var b = devices.querySelector( '[data-device="' + d.key + '"]' ); if ( b ) b.classList.toggle( 'is-active', d.key === dm.key ); } );
+				currentDevice = dm.key;
+				canvasWrap.className = 'maf-b-preview__canvas-wrap maf-b-preview__canvas-wrap' + dm.cls;
+			} }, [ icon( dm.icon ), dm.label ] );
+			btn.setAttribute( 'data-device', dm.key );
+			devices.appendChild( btn );
+		} );
+		headerRow.appendChild( devices );
+		wrap.appendChild( headerRow );
+		
+		var canvasWrap = el( 'div', { class: 'maf-b-preview__canvas-wrap maf-b-preview__canvas-wrap--desktop' } );
 		var form = el( 'div', { class: 'maf-form maf-b-preview__form', dir: MAF_BUILDER.isRtl ? 'rtl' : 'ltr' } );
 
 		schema.forEach( function ( sec ) {
@@ -1211,12 +1289,31 @@
 			form.appendChild( card );
 		} );
 		form.appendChild( el( 'div', { class: 'maf-submit-row' }, [ el( 'button', { type: 'button', class: 'maf-submit-btn', text: 'Send Application', disabled: true } ) ] ) );
-		wrap.appendChild( form );
+		canvasWrap.appendChild( form );
+		wrap.appendChild( canvasWrap );
 		return wrap;
 	}
 
 	function previewField( f ) {
-		var wrap = el( 'div', { class: 'maf-field maf-field--' + f.type + ' maf-field--w-' + ( f.width || 'full' ) } );
+		// Determine responsive width classes.
+		var rwCls = '';
+		if ( f.widths ) {
+			rwCls = ' maf-field--rw';
+			Object.keys( f.widths ).forEach( function ( bp ) {
+				var w = f.widths[ bp ];
+				var preset = w.preset || '';
+				var pct = w.pct ? parseInt( w.pct, 10 ) : null;
+				if ( preset && preset !== 'full' ) {
+					rwCls += ' maf-field--w-' + bp + '-' + preset;
+				} else if ( pct && pct < 100 ) {
+					rwCls += ' maf-field--w-' + bp + '-' + pct + 'p';
+				}
+			} );
+		}
+		// Legacy class for base/fallback width.
+		var legacyCls = ' maf-field--w-' + ( f.width || 'full' );
+		
+		var wrap = el( 'div', { class: 'maf-field maf-field--' + f.type + legacyCls + rwCls } );
 		if ( f.type === 'html' ) {
 			wrap.appendChild( el( 'div', { class: 'maf-html', html: f.content || '' } ) );
 			return wrap;

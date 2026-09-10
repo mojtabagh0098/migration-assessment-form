@@ -169,6 +169,7 @@ class MAF_CPT {
 					'widthFull'         => __( 'Full', 'migration-assessment-form' ),
 					'widthHalf'         => __( 'Half', 'migration-assessment-form' ),
 					'widthThird'        => __( 'Third', 'migration-assessment-form' ),
+					'preset'            => __( 'Preset', 'migration-assessment-form' ),
 					'min'               => __( 'Min', 'migration-assessment-form' ),
 					'max'               => __( 'Max', 'migration-assessment-form' ),
 					'step'              => __( 'Step', 'migration-assessment-form' ),

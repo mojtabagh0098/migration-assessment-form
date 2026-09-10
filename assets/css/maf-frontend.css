@@ -181,9 +181,11 @@ html[dir="rtl"] .maf-field textarea {
 .maf-field--w-half  { --maf-field-w: 50%;  }
 .maf-field--w-third { --maf-field-w: 33.3333%; }
 
+/* Responsive fields: when a field has .maf-field--rw, the inline scoped styles
+   take priority — no extra global rules needed.  For legacy fields without
+   .maf-field--rw, collapse to full-width on small screens. */
 @media (max-width: 640px) {
-	.maf-field--w-half,
-	.maf-field--w-third { --maf-field-w: 100%; }
+	.maf-grid > .maf-field:not(.maf-field--rw) { width: 100%; }
 }
 
 .maf-card__desc {
@@ -276,7 +278,7 @@ html[dir="rtl"] .maf-field textarea {
 }
 
 @media (max-width: 640px) {
-	.maf-field--w-custom { --maf-field-w: 100%; }
+	.maf-grid > .maf-field:not(.maf-field--rw).maf-field--w-custom { width: 100%; }
 }
 
 .maf-upload__size { color: #8c8f94; font-size: 12px; }

@@ -363,6 +363,55 @@ html[dir="rtl"] .maf-b-toggle input:checked + .maf-b-toggle__track::after { tran
 .maf-b-options__actions { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
 .maf-b-group textarea { width: 100%; margin-top: 8px; }
 
+/* Responsive Width Controls */
+.maf-b-rw-breakpoint {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 6px 8px;
+	background: #fff;
+	border: 1px solid var(--mafb-border);
+	border-radius: 6px;
+	margin-bottom: 6px;
+}
+.maf-b-rw-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--mafb-text);
+	min-width: 90px;
+}
+.maf-b-rw-preset {
+	width: auto;
+	min-width: 110px;
+}
+.maf-b-rw-pct-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	font-size: 11px;
+	color: var(--mafb-muted);
+	white-space: nowrap;
+}
+.maf-b-rw-pct-label input {
+	width: 64px !important;
+	text-align: center;
+}
+
+/* Device size toggle buttons in preview */
+.maf-b-preview__devices { display: inline-flex; gap: 2px; background: var(--mafb-bg); border-radius: 6px; padding: 2px; margin-inline-end: 8px; }
+.maf-b-preview__device-btn { border: 0; background: transparent; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; color: var(--mafb-muted); display: inline-flex; align-items: center; gap: 3px; transition: all .15s; }
+.maf-b-preview__device-btn:hover { color: var(--mafb-text); }
+.maf-b-preview__device-btn.is-active { background: var(--mafb-panel); color: var(--mafb-primary); box-shadow: var(--mafb-shadow); }
+.maf-b-preview__device-btn .dashicons { font-size: 14px; width: 14px; height: 14px; }
+
+/* Preview canvas wrapper with device sizing */
+.maf-b-preview__canvas-wrap { transition: max-width .3s ease; overflow: auto; }
+.maf-b-preview__canvas-wrap--desktop { max-width: 1440px; }
+.maf-b-preview__canvas-wrap--laptop { max-width: 1024px; }
+.maf-b-preview__canvas-wrap--tablet { max-width: 768px; }
+.maf-b-preview__canvas-wrap--mobile { max-width: 375px; }
+
 /* ------------------------------------------------------------------ */
 /* Preview tab                                                         */
 /* ------------------------------------------------------------------ */
@@ -377,6 +426,24 @@ html[dir="rtl"] .maf-b-toggle input:checked + .maf-b-toggle__track::after { tran
 .maf-b-preview .maf-field { grid-column: span 6; display: flex; flex-direction: column; gap: 6px; }
 .maf-b-preview .maf-field--w-half { grid-column: span 3; }
 .maf-b-preview .maf-field--w-third { grid-column: span 2; }
+/* Responsive preset widths in preview */
+.maf-b-preview .maf-field--w-desktop-half { grid-column: span 3; }
+.maf-b-preview .maf-field--w-desktop-third { grid-column: span 2; }
+.maf-b-preview .maf-field--w-laptop-half { grid-column: span 3; }
+.maf-b-preview .maf-field--w-laptop-third { grid-column: span 2; }
+.maf-b-preview .maf-field--w-tablet-half { grid-column: span 3; }
+.maf-b-preview .maf-field--w-tablet-third { grid-column: span 2; }
+.maf-b-preview .maf-field--w-mobile-half { grid-column: span 3; }
+.maf-b-preview .maf-field--w-mobile-third { grid-column: span 2; }
+/* Custom percentage widths in preview */
+.maf-b-preview .maf-field--w-desktop-50p { grid-column: span 3 !important; }
+.maf-b-preview .maf-field--w-desktop-66p { grid-column: span 4 !important; }
+.maf-b-preview .maf-field--w-laptop-50p { grid-column: span 3 !important; }
+.maf-b-preview .maf-field--w-laptop-66p { grid-column: span 4 !important; }
+.maf-b-preview .maf-field--w-tablet-50p { grid-column: span 3 !important; }
+.maf-b-preview .maf-field--w-tablet-66p { grid-column: span 4 !important; }
+.maf-b-preview .maf-field--w-mobile-50p { grid-column: span 3 !important; }
+.maf-b-preview .maf-field--w-mobile-66p { grid-column: span 4 !important; }
 .maf-b-preview .maf-field label { font-weight: 500; font-size: 14px; }
 .maf-b-preview .maf-field input, .maf-b-preview .maf-field select, .maf-b-preview .maf-field textarea { width: 100%; max-width: none; padding: 8px 12px; border: 1px solid #c3c4c7; border-radius: 6px; font-size: 14px; background: #fff; }
 .maf-b-preview .maf-required { color: var(--mafb-danger); margin-inline-start: 2px; }

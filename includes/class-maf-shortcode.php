@@ -125,34 +125,81 @@ class MAF_Shortcode {
 		$required    = ! empty( $field['required'] );
 		$condition   = ! empty( $field['condition'] ) ? wp_json_encode( $field['condition'] ) : '';
 		
-		// Width logic - convert to percentage for inline style.
+		// Width helpers.
 		$width_map = array( 'full' => 100, 'half' => 50, 'third' => 33.3333 );
+		
+		// Resolve base width.
+		$pct     = 100;
+		$width_class = 'maf-field--w-full';
 		if ( ! empty( $field['width_pc'] ) ) {
 			$pct = max( 1, min( 100, (int) $field['width_pc'] ) );
 		} else {
-			$w   = isset( $field['width'] ) ? $field['width'] : 'full';
+			$w = isset( $field['width'] ) ? $field['width'] : 'full';
 			$pct = isset( $width_map[ $w ] ) ? $width_map[ $w ] : 100;
 		}
-		$style       = ' style="--maf-field-w:' . $pct . '%"';
 		$width_class = 'maf-field--w-' . ( $pct == 100 ? 'full' : ( $pct == 50 ? 'half' : ( $pct <= 33.3334 ? 'third' : 'custom' ) ) );
-
+		
+		// Responsive widths: output a tiny inline <style> scoped to this field.
+		$responsive_style = '';
+		$has_widths       = false;
+		if ( ! empty( $field['widths'] ) && is_array( $field['widths'] ) ) {
+			$has_widths = true;
+			$scoped     = '.rf_' . esc_attr( $field_id );
+			
+			// Open style tag with base fallback.
+			$responsive_style = '<style>' . $scoped . '{display:flex;flex-direction:column;gap:6px;width:' . $pct . '%;min-width:0;box-sizing:border-box}';
+			
+			$breakpoints = array(
+				array( 'key' => 'mobile',  'min' => 0    ),
+				array( 'key' => 'tablet',  'min' => 768  ),
+				array( 'key' => 'laptop',  'min' => 1024 ),
+				array( 'key' => 'desktop', 'min' => 1400 ),
+			);
+			foreach ( $breakpoints as $bp ) {
+				if ( isset( $field['widths'][ $bp['key'] ] ) ) {
+					$bw = $field['widths'][ $bp['key'] ];
+					$bp_preset = isset( $bw['preset'] ) && $bw['preset'] && $bw['preset'] !== 'inherit' ? $bw['preset'] : '';
+					$bp_pct    = isset( $bw['pct'] ) && $bw['pct'] ? max( 1, min( 100, (int) $bw['pct'] ) ) : null;
+					
+					$bp_value = null;
+					if ( $bp_pct ) {
+						$bp_value = $bp_pct;
+					} elseif ( $bp_preset ) {
+						$bp_value = isset( $width_map[ $bp_preset ] ) ? $width_map[ $bp_preset ] : 100;
+					}
+					
+					if ( null !== $bp_value ) {
+						if ( $bp['min'] > 0 ) {
+							$responsive_style .= '@media(min-width:' . $bp['min'] . 'px){' . $scoped . '{width:' . $bp_value . '%}}';
+						} else {
+							$responsive_style .= $scoped . '{width:' . $bp_value . '%}';
+						}
+					}
+				}
+			}
+			$responsive_style .= '</style>';
+		}
+		
 		$placeholder = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
 		$wrap_attrs  = $condition ? ' data-condition=\'' . esc_attr( $condition ) . '\' hidden' : '';
 		$wrap_attrs .= ' id="' . esc_attr( $field_id . '-wrap' ) . '"';
 		
 		$classes = 'maf-field maf-field--' . esc_attr( $type ) . ' ' . $width_class;
+		if ( $has_widths ) {
+			$classes .= ' maf-field--rw rf_' . esc_attr( $field_id );
+		}
 		if ( $condition ) {
 			$classes .= ' maf-field--conditional';
 		}
 		if ( ! empty( $field['custom_class'] ) ) {
 			$classes .= ' ' . esc_attr( $field['custom_class'] );
 		}
-
+		
 		$req_attr    = $required ? ' required' : '';
 		$ph_attr     = $placeholder ? ' placeholder="' . esc_attr( $placeholder ) . '"' : '';
 		$maxlen_attr = ! empty( $field['maxlength'] ) ? ' maxlength="' . (int) $field['maxlength'] . '"' : '';
 		?>
-		<div class="<?php echo esc_attr( $classes ); ?>" data-key="<?php echo esc_attr( $field['key'] ); ?>"<?php echo $wrap_attrs . $style; ?>>
+		<div class="<?php echo esc_attr( $classes ); ?>" data-key="<?php echo esc_attr( $field['key'] ); ?>"<?php echo $wrap_attrs; ?>><?php echo $responsive_style; ?>
 			<?php if ( 'html' === $type ) : ?>
 				<div class="maf-html"><?php echo wp_kses_post( $field['content'] ?? '' ); ?></div>
 				<?php return; ?>

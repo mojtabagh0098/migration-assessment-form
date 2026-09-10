@@ -605,6 +605,30 @@ class MAF_Fields {
 					$cf['custom_class'] = sanitize_text_field( $field['custom_class'] );
 				}
 
+				// Responsive widths (per-breakpoint object: { desktop: {preset,pct}, laptop: … }).
+				if ( ! empty( $field['widths'] ) && is_array( $field['widths'] ) ) {
+					$valid_presets  = array( '', 'full', 'half', 'third', 'inherit' );
+					$valid_bp_keys = array( 'desktop', 'laptop', 'tablet', 'mobile' );
+					$clean_widths  = array();
+					foreach ( $field['widths'] as $bp_key => $bp_val ) {
+						if ( ! in_array( $bp_key, $valid_bp_keys, true ) || ! is_array( $bp_val ) ) {
+							continue;
+						}
+						$entry = array();
+						if ( isset( $bp_val['preset'] ) && in_array( (string) $bp_val['preset'], $valid_presets, true ) ) {
+							$entry['preset'] = (string) $bp_val['preset'];
+						}
+						if ( ! empty( $bp_val['pct'] ) ) {
+							$entry['pct'] = max( 1, min( 100, (int) $bp_val['pct'] ) );
+						}
+						if ( ! empty( $entry ) ) {
+							$clean_widths[ $bp_key ] = $entry;
+						}
+					}
+					if ( ! empty( $clean_widths ) ) {
+						$cf['widths'] = $clean_widths;
+					}
+				}
 
 				if ( in_array( $type, array( 'select', 'radio', 'checkbox_group' ), true ) ) {
 					$cf['options'] = array();
