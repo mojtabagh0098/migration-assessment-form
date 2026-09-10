@@ -66,7 +66,9 @@ class MAF_CPT {
 	}
 
 	/**
-	 * Meta box: form schema builder (label overrides + advanced JSON) and shortcode display.
+	 * Meta box: form schema builder (label overrides + advanced JSON).
+	 * The Shortcode and Publish controls are embedded inside the builder header
+	 * so that it can occupy the full width of the edit screen.
 	 *
 	 * @param string $post_type Current post type.
 	 */
@@ -75,14 +77,8 @@ class MAF_CPT {
 			return;
 		}
 
-		add_meta_box(
-			'maf_form_shortcode',
-			__( 'Shortcode', 'migration-assessment-form' ),
-			array( $this, 'render_shortcode_box' ),
-			self::POST_TYPE,
-			'side',
-			'high'
-		);
+		// Remove core Publish meta box — its controls live inside the builder header now.
+		remove_meta_box( 'submitdiv', self::POST_TYPE, 'side' );
 
 		add_meta_box(
 			'maf_form_schema',
@@ -91,19 +87,6 @@ class MAF_CPT {
 			self::POST_TYPE,
 			'normal',
 			'high'
-		);
-	}
-
-	/**
-	 * Renders the read-only shortcode box.
-	 *
-	 * @param WP_Post $post Current post.
-	 */
-	public function render_shortcode_box( $post ) {
-		printf(
-			'<p><input type="text" readonly onclick="this.select();" style="width:100%%" value="%s" /></p><p class="description">%s</p>',
-			esc_attr( '[assessment_form id="' . $post->ID . '"]' ),
-			esc_html__( 'Copy this shortcode into any page or template. Each language version of this form has its own post ID and its own shortcode.', 'migration-assessment-form' )
 		);
 	}
 
@@ -124,6 +107,10 @@ class MAF_CPT {
 		wp_enqueue_style( 'maf-builder', MAF_PLUGIN_URL . 'assets/css/maf-builder.css', array( 'dashicons' ), MAF_VERSION );
 		wp_enqueue_script( 'maf-builder', MAF_PLUGIN_URL . 'assets/js/maf-builder.js', array(), MAF_VERSION, true );
 
+		global $post;
+		$is_new    = 'post-new.php' === $hook;
+		$shortcode = $is_new ? '' : '[assessment_form id="' . $post->ID . '"]';
+
 		wp_localize_script(
 			'maf-builder',
 			'MAF_BUILDER',
@@ -131,6 +118,9 @@ class MAF_CPT {
 				'fieldTypes'   => MAF_Fields::field_types(),
 				'fileDefaults' => MAF_Fields::default_file_settings(),
 				'isRtl'        => is_rtl(),
+				'isNewPost'    => $is_new,
+				'postStatus'   => $is_new ? 'auto-draft' : get_post_status( $post ),
+				'shortcode'    => $shortcode,
 				'i18n'         => array(
 					'sections'          => __( 'Sections', 'migration-assessment-form' ),
 					'fields'            => __( 'Fields', 'migration-assessment-form' ),
@@ -232,6 +222,11 @@ class MAF_CPT {
 					'select'            => __( '— Select —', 'migration-assessment-form' ),
 					'chooseFile'        => __( 'Choose file…', 'migration-assessment-form' ),
 					'dragHint'          => __( 'Drag to reorder', 'migration-assessment-form' ),
+					'publish'           => __( 'Publish', 'migration-assessment-form' ),
+					'update'            => __( 'Update', 'migration-assessment-form' ),
+					'saveDraft'         => __( 'Save Draft', 'migration-assessment-form' ),
+					'shortcode'         => __( 'Shortcode', 'migration-assessment-form' ),
+					'copyShortcode'     => __( 'Copy shortcode', 'migration-assessment-form' ),
 				),
 			)
 		);

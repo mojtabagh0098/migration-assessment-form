@@ -422,6 +422,78 @@
 			dirty ? el( 'span', { class: 'maf-b-dirty', text: I18N.unsaved } ) : null,
 		] ) );
 
+		// ---------- Shortcode (only for saved posts) ----------
+		if ( MAF_BUILDER.shortcode ) {
+			var scInput = el( 'input', {
+				type: 'text', value: MAF_BUILDER.shortcode, class: 'maf-b-shortcode__input',
+				'readonly': 'readonly',
+			} );
+			scInput.addEventListener( 'click', function () { scInput.select(); } );
+
+			var copyBtn = el( 'button', {
+				type: 'button', class: 'button maf-b-iconbtn', title: I18N.copyShortcode || I18N.shortcode,
+				onClick: function () {
+					scInput.select();
+					if ( navigator.clipboard ) {
+						navigator.clipboard.writeText( scInput.value ).then( function () {
+							copyBtn.classList.add( 'is-copied' );
+							setTimeout( function () { copyBtn.classList.remove( 'is-copied' ); }, 1200 );
+						} );
+					} else {
+						document.execCommand( 'copy' );
+					}
+				},
+			}, [ icon( 'clipboard' ) ] );
+
+			header.appendChild( el( 'div', { class: 'maf-b-shortcode' }, [ scInput, copyBtn ] ) );
+		}
+
+		// ---------- Actions: Undo, Redo, Reset, Publish ----------
+		var isPublished = MAF_BUILDER.postStatus === 'publish';
+		var publishLabel = isPublished ? ( I18N.update || 'Update' ) : ( I18N.publish || 'Publish' );
+
+		var publishBtn = el( 'button', {
+			type: 'button', class: 'button button-primary button-large maf-b-publish',
+			onClick: function () {
+				if ( activeTab === 'json' ) {
+					applyJson( true );
+				}
+				sync();
+				// Trigger the native WP post form submit.
+				var postForm = document.getElementById( 'post' );
+				if ( postForm ) {
+					postForm.submit();
+				}
+			},
+		}, [ icon( 'saved' ), publishLabel ] );
+
+		var draftBtn = null;
+		if ( ! isPublished ) {
+			draftBtn = el( 'button', {
+				type: 'button', class: 'button maf-b-draft',
+				onClick: function () {
+					if ( activeTab === 'json' ) {
+						applyJson( true );
+					}
+					sync();
+					// Set post_status to draft before submit.
+					var statusInput = document.getElementById( 'hidden_post_status' ) || document.getElementById( 'post_status' );
+					if ( statusInput ) {
+						statusInput.value = 'draft';
+					}
+					// Also update the visible post_status select if it exists.
+					var postStatusSel = document.getElementById( 'post_status' );
+					if ( postStatusSel ) {
+						postStatusSel.value = 'draft';
+					}
+					var postForm = document.getElementById( 'post' );
+					if ( postForm ) {
+						postForm.submit();
+					}
+				},
+			}, [ icon( 'edit' ), I18N.saveDraft || 'Save Draft' ] );
+		}
+
 		header.appendChild( el( 'div', { class: 'maf-b-actions' }, [
 			el( 'button', { type: 'button', class: 'button maf-b-iconbtn', title: I18N.undo, disabled: ! history.length, onClick: undo }, [ icon( 'undo' ) ] ),
 			el( 'button', { type: 'button', class: 'button maf-b-iconbtn', title: I18N.redo, disabled: ! future.length, onClick: redo }, [ icon( 'redo' ) ] ),
@@ -434,6 +506,8 @@
 					sync();
 				}
 			} }, [ I18N.resetDefault ] ),
+			draftBtn,
+			publishBtn,
 		] ) );
 	}
 
