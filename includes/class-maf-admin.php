@@ -345,18 +345,18 @@ class MAF_Admin {
 				}, array() ),
 				'activeLang'   => MAF_WPML::admin_active_language(),
 				'languages'    => MAF_WPML::active_languages(),
-				'l10n'         => array(
-					'all_importance'  => __( 'All importance', 'migration-assessment-form' ),
-					'all_steps'       => __( 'All steps', 'migration-assessment-form' ),
-					'all_programs'    => __( 'All programs', 'migration-assessment-form' ),
-					'all_assigned_by' => __( 'All assigned by', 'migration-assessment-form' ),
-					'all_assigned_to' => __( 'All assigned to', 'migration-assessment-form' ),
-					'confirmStatus'   => __( 'Add an optional note for this status change:', 'migration-assessment-form' ),
-					'saved'           => __( 'Saved.', 'migration-assessment-form' ),
-					'error'           => __( 'Something went wrong.', 'migration-assessment-form' ),
-					'noResults'       => __( 'No entries match the current filters.', 'migration-assessment-form' ),
-					'loading'         => __( 'Loading…', 'migration-assessment-form' ),
-				),
+				MAF_ADMIN_CONFIG.i18n = array(
+						'all_importance'  => __( 'All importance', 'migration-assessment-form' ),
+						'all_steps'       => __( 'All steps', 'migration-assessment-form' ),
+						'all_programs'    => __( 'All programs', 'migration-assessment-form' ),
+						'all_assigned_by' => __( 'All assigned by', 'migration-assessment-form' ),
+						'all_assigned_to' => __( 'All assigned to', 'migration-assessment-form' ),
+						'confirmStatus'   => __( 'Add an optional note for this status change:', 'migration-assessment-form' ),
+						'saved'           => __( 'Saved.', 'migration-assessment-form' ),
+						'error'           => __( 'Something went wrong.', 'migration-assessment-form' ),
+						'noResults'       => __( 'No entries match the current filters.', 'migration-assessment-form' ),
+						'loading'         => __( 'Loading…', 'migration-assessment-form' ),
+					);
 			)
 		);
 	}

@@ -38,7 +38,7 @@
 		// Add the "All importance" option at the beginning
 		var allImportanceOption = document.createElement( 'option' );
 		allImportanceOption.value = '';
-		allImportanceOption.textContent = MAF_ADMIN_CONFIG.l10n.all_importance;
+		allImportanceOption.textContent = MAF_ADMIN_CONFIG.i18n.all_importance;
 		importanceSelect.appendChild( allImportanceOption );
 		(MAF_ADMIN_CONFIG.importance_options || []).forEach( function ( opt ) {
 			var o = document.createElement( 'option' );
@@ -52,7 +52,7 @@
 		// Add the "All steps" option at the beginning
 		var allStepsOption = document.createElement( 'option' );
 		allStepsOption.value = '';
-		allStepsOption.textContent = MAF_ADMIN_CONFIG.l10n.all_steps;
+		allStepsOption.textContent = MAF_ADMIN_CONFIG.i18n.all_steps;
 		stepSelect.appendChild( allStepsOption );
 		(MAF_ADMIN_CONFIG.steps_options || []).forEach( function ( opt ) {
 			var o = document.createElement( 'option' );
@@ -66,7 +66,7 @@
 		// Add the "All programs" option at the beginning
 		var allProgramsOption = document.createElement( 'option' );
 		allProgramsOption.value = '';
-		allProgramsOption.textContent = MAF_ADMIN_CONFIG.l10n.all_programs;
+		allProgramsOption.textContent = MAF_ADMIN_CONFIG.i18n.all_programs;
 		programSelect.appendChild( allProgramsOption );
 		(MAF_ADMIN_CONFIG.programs_options || []).forEach( function ( opt ) {
 			var o = document.createElement( 'option' );
@@ -82,7 +82,7 @@
 		// Add the "All assigned by" option at the beginning
 		var allAssignedByOption = document.createElement( 'option' );
 		allAssignedByOption.value = '0';
-		allAssignedByOption.textContent = MAF_ADMIN_CONFIG.l10n.all_assigned_by;
+		allAssignedByOption.textContent = MAF_ADMIN_CONFIG.i18n.all_assigned_by;
 		if (assignedBySelect) {
 			assignedBySelect.appendChild( allAssignedByOption );
 		}
@@ -90,7 +90,7 @@
 		// Add the "All assigned to" option at the beginning
 		var allAssignedToOption = document.createElement( 'option' );
 		allAssignedToOption.value = '0';
-		allAssignedToOption.textContent = MAF_ADMIN_CONFIG.l10n.all_assigned_to;
+		allAssignedToOption.textContent = MAF_ADMIN_CONFIG.i18n.all_assigned_to;
 		if (assignedToSelect) {
 			assignedToSelect.appendChild( allAssignedToOption );
 		}
