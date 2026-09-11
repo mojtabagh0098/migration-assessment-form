@@ -356,7 +356,7 @@ class MAF_Admin {
 						'error'           => __( 'Something went wrong.', 'migration-assessment-form' ),
 						'noResults'       => __( 'No entries match the current filters.', 'migration-assessment-form' ),
 						'loading'         => __( 'Loading…', 'migration-assessment-form' ),
-					);
+					)
 			)
 		);
 	}
