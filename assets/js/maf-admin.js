@@ -569,9 +569,21 @@
 					return '<option value="' + s + '"' + ( s === entry.status ? ' selected' : '' ) + '>' + s + '</option>';
 				} ).join( '' ) +
 			'</select></label> ' +
-			'<label>Importance: <input type="text" id="maf-modal-importance" value="' + escapeHtml( entry.importance || '' ) + '"></label> ' +
-			'<label>Step: <input type="text" id="maf-modal-step" value="' + escapeHtml( entry.step || '' ) + '"></label> ' +
-			'<label>Program Type: <input type="text" id="maf-modal-program_type" value="' + escapeHtml( entry.program_type || '' ) + '"></label> ' +
+			'<label>Importance: <select id="maf-modal-importance">' +
+				MAF_ADMIN_CONFIG.importance_options.map( function ( opt ) {
+					return '<option value="' + escapeHtml( opt ) + '"' + ( opt === ( entry.importance || 'Normal' ) ? ' selected' : '' ) + '>' + escapeHtml( opt ) + '</option>';
+				} ).join( '' ) +
+			'</select></label> ' +
+			'<label>Step: <select id="maf-modal-step">' +
+				MAF_ADMIN_CONFIG.steps_options.map( function ( opt ) {
+					return '<option value="' + escapeHtml( opt ) + '"' + ( opt === ( entry.step || 'Assessment' ) ? ' selected' : '' ) + '>' + escapeHtml( opt ) + '</option>';
+				} ).join( '' ) +
+			'</select></label> ' +
+			'<label>Program Type: <select id="maf-modal-program_type">' +
+				MAF_ADMIN_CONFIG.programs_options.map( function ( opt ) {
+					return '<option value="' + escapeHtml( opt ) + '"' + ( opt === ( entry.program_type || 'none' ) ? ' selected' : '' ) + '>' + escapeHtml( opt ) + '</option>';
+				} ).join( '' ) +
+			'</select></label> ' +
 			'<label>Assigned By: <select id="maf-modal-assigned_by">' +
 				Object.keys( MAF_ADMIN_CONFIG.users ).map( function ( id ) {
 					return '<option value="' + id + '"' + ( id == entry.assigned_by ? ' selected' : '' ) + '>' + escapeHtml( MAF_ADMIN_CONFIG.users[ id ] ) + '</option>';

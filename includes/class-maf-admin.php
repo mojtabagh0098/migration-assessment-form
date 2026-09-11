@@ -317,6 +317,10 @@ class MAF_Admin {
 			$user_options[ $user->ID ] = $user->display_name;
 		}
 
+		$opt_importance = explode( "\n", str_replace( "\r", "", get_option( 'maf_option_importance', "Normal\nImportant\nUrgent" ) ) );
+		$opt_steps      = explode( "\n", str_replace( "\r", "", get_option( 'maf_option_steps', "Assessment\nassessment follow up\nCancelled\nContract follow up\ncontract signed\ncompleted\n1st payment in process\nprocessing fee payment\n2nd payment in process\nConsulting or initial contract fee\ncosulting or initial cont. fee payment" ) ) );
+		$opt_programs   = explode( "\n", str_replace( "\r", "", get_option( 'maf_option_program_types', "Quebec Investor\nPEQ\nFederal Self Employed\nExpress Entry\nQuebec Skilled Worker\nSponsorship\nStudent\nSuper Visa\nVisitor Visa\nSaskatchewan Business\nNova Scotia Business\nBritish Columbia Business\nPEI Entrepreneur\nManitoba Entrepreneur\nQuebec Entrepreneur\nMorden\nCanadian experience class\nstart up visa" ) ) );
+
 		wp_localize_script(
 			'maf-admin',
 			'MAF_ADMIN_CONFIG',
@@ -327,6 +331,9 @@ class MAF_Admin {
 				'exportPdfUrl' => wp_nonce_url( admin_url( 'admin-post.php?action=maf_export_pdf' ), 'maf_export' ),
 				'forms'        => $form_options,
 				'users'        => $user_options,
+				'importance_options' => array_filter( array_map( 'trim', $opt_importance ) ),
+				'steps_options'      => array_filter( array_map( 'trim', $opt_steps ) ),
+				'programs_options'   => array_filter( array_map( 'trim', $opt_programs ) ),
 				'schemas'      => array_reduce( $forms, function ( $acc, $form ) {
 					$acc[ $form->ID ] = MAF_Fields::flatten( MAF_Fields::get_schema( $form->ID ) );
 					return $acc;
