@@ -13,7 +13,7 @@
 
 	document.addEventListener( 'DOMContentLoaded', function () {
 		populateFormFilter();
-		populateLanguageFilter();
+		populateToolbarFilters();
 		wireToolbar();
 		wireModal();
 		fetchEntries();
@@ -211,10 +211,14 @@
 		var params = new URLSearchParams();
 		var map = {
 			'maf-filter-form': 'form_id',
-			'maf-filter-language': 'language',
 			'maf-filter-status': 'status',
 			'maf-filter-country': 'country_residence',
 			'maf-filter-search': 'search',
+			'maf-modal-importance': 'importance',
+			'maf-modal-step': 'step',
+			'maf-modal-program_type': 'program_type',
+			'maf-modal-assigned_by': 'assigned_by',
+			'maf-modal-assigned_to': 'assigned_to',
 		};
 		Object.keys( map ).forEach( function ( id ) {
 			var val = document.getElementById( id ).value;

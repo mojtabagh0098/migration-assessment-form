@@ -374,31 +374,31 @@ class MAF_Admin {
 					<option value=""><?php esc_html_e( 'All forms', 'migration-assessment-form' ); ?></option>
 				</select>
 
-				<select id="maf-filter-language">
-					<option value=""><?php esc_html_e( 'All languages', 'migration-assessment-form' ); ?></option>
-				</select>
-
 				<select id="maf-filter-status">
 					<option value=""><?php esc_html_e( 'All statuses', 'migration-assessment-form' ); ?></option>
 					<option value="submitted"><?php esc_html_e( 'Submitted', 'migration-assessment-form' ); ?></option>
-					<option value="submitted"><?php esc_html_e( 'Submitted', 'migration-assessment-form' ); ?></option>
 					<option value="conditional"><?php esc_html_e( 'Conditional', 'migration-assessment-form' ); ?></option>
 					<option value="approved"><?php esc_html_e( 'Approved', 'migration-assessment-form' ); ?></option>
 					<option value="rejected"><?php esc_html_e( 'Rejected', 'migration-assessment-form' ); ?></option>
 				</select>
                 
-				<select id="maf-filter-importance">
+				<select id="maf-modal-importance">
 					<option value=""><?php esc_html_e( 'All importance', 'migration-assessment-form' ); ?></option>
 				</select>
-				<select id="maf-filter-step">
+				<select id="maf-modal-step">
 					<option value=""><?php esc_html_e( 'All steps', 'migration-assessment-form' ); ?></option>
 				</select>
                 
-				<select type="text" id="maf-filter-program" placeholder="<?php esc_attr_e( 'Program type', 'migration-assessment-form' ); ?>">
-
-					<option value="conditional"><?php esc_html_e( 'Conditional', 'migration-assessment-form' ); ?></option>
-					<option value="approved"><?php esc_html_e( 'Approved', 'migration-assessment-form' ); ?></option>
-					<option value="rejected"><?php esc_html_e( 'Rejected', 'migration-assessment-form' ); ?></option>
+				<select id="maf-modal-program_type">
+					<option value=""><?php esc_html_e( 'All programs', 'migration-assessment-form' ); ?></option>
+				</select>
+				
+				<select id="maf-modal-assigned_by">
+					<option value=""><?php esc_html_e( 'All assigned by', 'migration-assessment-form' ); ?></option>
+				</select>
+				
+				<select id="maf-modal-assigned_to">
+					<option value=""><?php esc_html_e( 'All assigned to', 'migration-assessment-form' ); ?></option>
 				</select>
 
 				<input type="text" id="maf-filter-country" placeholder="<?php esc_attr_e( 'Country of residence', 'migration-assessment-form' ); ?>" />
