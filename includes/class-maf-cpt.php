@@ -319,9 +319,11 @@ class MAF_CPT {
 		if ( 'maf_translations' === $column ) {
 			echo esc_html( MAF_WPML::translation_status_label( $post_id ) );
 		}
-	}
+
+		
 		if ( 'maf_status' === $column ) {
 			echo 'Status';
 		}
+	}
 
 }
