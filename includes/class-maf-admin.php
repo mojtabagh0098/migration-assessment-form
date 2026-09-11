@@ -317,9 +317,14 @@ class MAF_Admin {
 			$user_options[ $user->ID ] = $user->display_name;
 		}
 
-		$opt_importance = explode( "\n", str_replace( "\r", "", get_option( 'maf_option_importance', "Normal\nImportant\nUrgent" ) ) );
-		$opt_steps      = explode( "\n", str_replace( "\r", "", get_option( 'maf_option_steps', "Assessment\nassessment follow up\nCancelled\nContract follow up\ncontract signed\ncompleted\n1st payment in process\nprocessing fee payment\n2nd payment in process\nConsulting or initial contract fee\ncosulting or initial cont. fee payment" ) ) );
-		$opt_programs   = explode( "\n", str_replace( "\r", "", get_option( 'maf_option_program_types', "Quebec Investor\nPEQ\nFederal Self Employed\nExpress Entry\nQuebec Skilled Worker\nSponsorship\nStudent\nSuper Visa\nVisitor Visa\nSaskatchewan Business\nNova Scotia Business\nBritish Columbia Business\nPEI Entrepreneur\nManitoba Entrepreneur\nQuebec Entrepreneur\nMorden\nCanadian experience class\nstart up visa" ) ) );
+		$saved_importance = get_option( 'maf_option_importance' );
+		$opt_importance   = explode( "\n", str_replace( "\r", "", !empty($saved_importance) ? $saved_importance : "Normal\nImportant\nUrgent" ) );
+		
+		$saved_steps      = get_option( 'maf_option_steps' );
+		$opt_steps        = explode( "\n", str_replace( "\r", "", !empty($saved_steps) ? $saved_steps : "Assessment\nassessment follow up\nCancelled\nContract follow up\ncontract signed\ncompleted\n1st payment in process\nprocessing fee payment\n2nd payment in process\nConsulting or initial contract fee\ncosulting or initial cont. fee payment" ) );
+		
+		$saved_programs   = get_option( 'maf_option_program_types' );
+		$opt_programs     = explode( "\n", str_replace( "\r", "", !empty($saved_programs) ? $saved_programs : "Quebec Investor\nPEQ\nFederal Self Employed\nExpress Entry\nQuebec Skilled Worker\nSponsorship\nStudent\nSuper Visa\nVisitor Visa\nSaskatchewan Business\nNova Scotia Business\nBritish Columbia Business\nPEI Entrepreneur\nManitoba Entrepreneur\nQuebec Entrepreneur\nMorden\nCanadian experience class\nstart up visa" ) );
 
 		wp_localize_script(
 			'maf-admin',
