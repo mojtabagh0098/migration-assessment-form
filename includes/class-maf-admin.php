@@ -345,7 +345,7 @@ class MAF_Admin {
 				}, array() ),
 				'activeLang'   => MAF_WPML::admin_active_language(),
 				'languages'    => MAF_WPML::active_languages(),
-				MAF_ADMIN_CONFIG.i18n => array(
+				'i18n'        => array(
 						'all_importance'  => __( 'All importance', 'migration-assessment-form' ),
 						'all_steps'       => __( 'All steps', 'migration-assessment-form' ),
 						'all_programs'    => __( 'All programs', 'migration-assessment-form' ),
