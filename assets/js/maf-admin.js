@@ -188,7 +188,9 @@
 			'marital_status': { label: 'Marital Status', type: 'select' },
 			'net_worth_cad': { label: 'Net Worth (CAD)', type: 'number' },
 			'status': { label: 'Status', type: 'select', options: { 'submitted': 'Submitted', 'conditional': 'Conditional', 'approved': 'Approved', 'rejected': 'Rejected' } },
-			'language': { label: 'Language', type: 'select', options: MAF_ADMIN_CONFIG.languages || {} }
+			'language': { label: 'Language', type: 'select', options: MAF_ADMIN_CONFIG.languages || {} },
+			'assigned_by': { label: 'Assigned By', type: 'select', options: MAF_ADMIN_CONFIG.users || {} },
+			'assigned_to': { label: 'Assigned To', type: 'select', options: MAF_ADMIN_CONFIG.users || {} }
 		};
 
 		var combined = Object.assign( {}, generalFields, fieldsMap );
@@ -358,7 +360,9 @@
 			'marital_status': { label: 'Marital Status', type: 'select', options: { 'single': 'Single', 'married': 'Married', 'divorced': 'Divorced', 'widowed': 'Widowed' } },
 			'net_worth_cad': { label: 'Net Worth (CAD)', type: 'number' },
 			'status': { label: 'Status', type: 'select', options: { 'submitted': 'Submitted', 'conditional': 'Conditional', 'approved': 'Approved', 'rejected': 'Rejected' } },
-			'language': { label: 'Language', type: 'select', options: MAF_ADMIN_CONFIG.languages || {} }
+			'language': { label: 'Language', type: 'select', options: MAF_ADMIN_CONFIG.languages || {} },
+			'assigned_by': { label: 'Assigned By', type: 'select', options: MAF_ADMIN_CONFIG.users || {} },
+			'assigned_to': { label: 'Assigned To', type: 'select', options: MAF_ADMIN_CONFIG.users || {} }
 		};
 
 		return generalFields[ fieldKey ] || { type: 'text', label: fieldKey };
@@ -565,6 +569,19 @@
 					return '<option value="' + s + '"' + ( s === entry.status ? ' selected' : '' ) + '>' + s + '</option>';
 				} ).join( '' ) +
 			'</select></label> ' +
+			'<label>Importance: <input type="text" id="maf-modal-importance" value="' + escapeHtml( entry.importance || '' ) + '"></label> ' +
+			'<label>Step: <input type="text" id="maf-modal-step" value="' + escapeHtml( entry.step || '' ) + '"></label> ' +
+			'<label>Program Type: <input type="text" id="maf-modal-program_type" value="' + escapeHtml( entry.program_type || '' ) + '"></label> ' +
+			'<label>Assigned By: <select id="maf-modal-assigned_by">' +
+				Object.keys( MAF_ADMIN_CONFIG.users ).map( function ( id ) {
+					return '<option value="' + id + '"' + ( id == entry.assigned_by ? ' selected' : '' ) + '>' + escapeHtml( MAF_ADMIN_CONFIG.users[ id ] ) + '</option>';
+				} ).join( '' ) +
+			'</select></label> ' +
+			'<label>Assigned To: <select id="maf-modal-assigned_to">' +
+				Object.keys( MAF_ADMIN_CONFIG.users ).map( function ( id ) {
+					return '<option value="' + id + '"' + ( id == entry.assigned_to ? ' selected' : '' ) + '>' + escapeHtml( MAF_ADMIN_CONFIG.users[ id ] ) + '</option>';
+				} ).join( '' ) +
+			'</select></label> ' +
 			'<textarea id="maf-modal-note" placeholder="Optional note…" rows="2" style="width:100%;margin-top:8px;"></textarea>' +
 			'<button type="button" class="button button-primary" id="maf-modal-save" style="margin-top:8px;">Save</button>' +
 			'<span id="maf-modal-save-status"></span>' +
@@ -586,6 +603,11 @@
 	 */
 	function saveEntryStatus( id ) {
 		var status = document.getElementById( 'maf-modal-status' ).value;
+		var importance = document.getElementById( 'maf-modal-importance' ).value;
+		var step = document.getElementById( 'maf-modal-step' ).value;
+		var program_type = document.getElementById( 'maf-modal-program_type' ).value;
+		var assigned_by = document.getElementById( 'maf-modal-assigned_by' ).value;
+		var assigned_to = document.getElementById( 'maf-modal-assigned_to' ).value;
 		var note = document.getElementById( 'maf-modal-note' ).value;
 		var statusEl = document.getElementById( 'maf-modal-save-status' );
 		statusEl.textContent = MAF_ADMIN_CONFIG.i18n.loading;
@@ -596,7 +618,15 @@
 				'Content-Type': 'application/json',
 				'X-WP-Nonce': MAF_ADMIN_CONFIG.nonce,
 			},
-			body: JSON.stringify( { status: status, note: note } ),
+			body: JSON.stringify( {
+				status: status,
+				importance: importance,
+				step: step,
+				program_type: program_type,
+				assigned_by: assigned_by,
+				assigned_to: assigned_to,
+				note: note
+			} ),
 		} )
 			.then( function ( res ) { return res.json(); } )
 			.then( function ( updated ) {

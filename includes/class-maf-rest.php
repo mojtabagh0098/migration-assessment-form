@@ -50,6 +50,11 @@ class MAF_REST {
 			'net_worth_cad'       => 'number',
 			'status'              => 'string',
 			'language'            => 'string',
+			'importance'          => 'string',
+			'step'                => 'string',
+			'program_type'        => 'string',
+			'assigned_by'         => 'number',
+			'assigned_to'         => 'number',
 		);
 
 		$schemas = array();
@@ -150,8 +155,12 @@ class MAF_REST {
 					break;
 				case 'equals':
 					if ( 'number' === $field_type ) {
-						$sub_wheres[] = "({$col_ref} + 0 = %f)";
-						$sub_values[] = (float) $val;
+						if ( 0 === (int) $val ) {
+							$sub_wheres[] = "({$col_ref} IS NULL OR {$col_ref} = 0)";
+						} else {
+							$sub_wheres[] = "({$col_ref} + 0 = %f)";
+							$sub_values[] = (float) $val;
+						}
 					} else {
 						$sub_wheres[] = "({$col_ref} = %s)";
 						$sub_values[] = $val;
@@ -159,8 +168,12 @@ class MAF_REST {
 					break;
 				case 'not_equals':
 					if ( 'number' === $field_type ) {
-						$sub_wheres[] = "({$col_ref} + 0 != %f)";
-						$sub_values[] = (float) $val;
+						if ( 0 === (int) $val ) {
+							$sub_wheres[] = "({$col_ref} IS NOT NULL AND {$col_ref} != 0)";
+						} else {
+							$sub_wheres[] = "({$col_ref} + 0 != %f OR {$col_ref} IS NULL)";
+							$sub_values[] = (float) $val;
+						}
 					} else {
 						$sub_wheres[] = "({$col_ref} != %s)";
 						$sub_values[] = $val;
@@ -882,14 +895,23 @@ class MAF_REST {
 		}
 
 		// Allow limited direct edits to a few hot columns (extend as needed).
-		$editable_columns = array( 'first_name', 'last_name', 'email', 'phone', 'country_residence' );
+		$editable_columns = array( 'first_name', 'last_name', 'email', 'phone', 'country_residence', 'importance', 'step', 'program_type', 'assigned_by', 'assigned_to' );
 		foreach ( $editable_columns as $col ) {
 			if ( isset( $body[ $col ] ) ) {
 				$new_val = sanitize_text_field( $body[ $col ] );
-				if ( $new_val !== $existing[ $col ] ) {
+				$col_format = '%s';
+				if ( in_array( $col, array( 'assigned_by', 'assigned_to' ), true ) ) {
+					$new_val = (int) $new_val;
+					if ( 0 === $new_val ) {
+						$new_val = null;
+					}
+					$col_format = '%d';
+				}
+
+				if ( $new_val != $existing[ $col ] ) {
 					MAF_Audit::log( $id, $col, $existing[ $col ], $new_val, $note );
 					$update[ $col ] = $new_val;
-					$formats[]      = '%s';
+					$formats[]      = $col_format;
 				}
 			}
 		}

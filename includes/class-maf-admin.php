@@ -311,6 +311,12 @@ class MAF_Admin {
 			$form_options[ $form->ID ] = $form->post_title;
 		}
 
+		$user_options = array( 0 => __( 'Unassigned', 'migration-assessment-form' ) );
+		$users = get_users( array( 'fields' => array( 'ID', 'display_name' ) ) );
+		foreach ( $users as $user ) {
+			$user_options[ $user->ID ] = $user->display_name;
+		}
+
 		wp_localize_script(
 			'maf-admin',
 			'MAF_ADMIN_CONFIG',
@@ -320,6 +326,7 @@ class MAF_Admin {
 				'exportCsvUrl' => wp_nonce_url( admin_url( 'admin-post.php?action=maf_export_csv' ), 'maf_export' ),
 				'exportPdfUrl' => wp_nonce_url( admin_url( 'admin-post.php?action=maf_export_pdf' ), 'maf_export' ),
 				'forms'        => $form_options,
+				'users'        => $user_options,
 				'schemas'      => array_reduce( $forms, function ( $acc, $form ) {
 					$acc[ $form->ID ] = MAF_Fields::flatten( MAF_Fields::get_schema( $form->ID ) );
 					return $acc;
@@ -397,10 +404,6 @@ class MAF_Admin {
 				<div id="maf-filter-rows-container"></div>
 				<div style="margin-top: 10px; display: flex; gap: 10px;">
 					<button type="button" class="button button-primary" id="maf-apply-advanced-filters"><?php esc_html_e( 'Apply Advanced Filters', 'migration-assessment-form' ); ?></button>
-						<th><?php esc_html_e( 'Importance', 'migration-assessment-form' ); ?></th>
-						<th><?php esc_html_e( 'Step', 'migration-assessment-form' ); ?></th>
-						<th><?php esc_html_e( 'Assigned To', 'migration-assessment-form' ); ?></th>
-
 					<button type="button" class="button" id="maf-reset-filters"><?php esc_html_e( 'Reset All', 'migration-assessment-form' ); ?></button>
 				</div>
 			</div>
