@@ -45,6 +45,50 @@
 		}
 	}
 
+	/** Fills the toolbar filter dropdowns (Importance, Steps, Program Type, Users) */
+	function populateToolbarFilters() {
+		// Populate Importance
+		var importanceSelect = document.getElementById( 'maf-modal-importance' );
+		(MAF_ADMIN_CONFIG.importance_options || []).forEach( function ( opt ) {
+			var o = document.createElement( 'option' );
+			o.value = opt;
+			o.textContent = opt;
+			importanceSelect.appendChild( o );
+		} );
+
+		// Populate Steps
+		var stepSelect = document.getElementById( 'maf-modal-step' );
+		(MAF_ADMIN_CONFIG.steps_options || []).forEach( function ( opt ) {
+			var o = document.createElement( 'option' );
+			o.value = opt;
+			o.textContent = opt;
+			stepSelect.appendChild( o );
+		} );
+
+		// Populate Program Type
+		var programSelect = document.getElementById( 'maf-modal-program_type' );
+		(MAF_ADMIN_CONFIG.programs_options || []).forEach( function ( opt ) {
+			var o = document.createElement( 'option' );
+			o.value = opt;
+			o.textContent = opt;
+			programSelect.appendChild( o );
+		} );
+
+		// Populate Users (Assigned By / Assigned To)
+		var userSelects = [ document.getElementById( 'maf-modal-assigned_by' ), document.getElementById( 'maf-modal-assigned_to' ) ];
+		userSelects.forEach( function( select ) {
+			if( select ) {
+				Object.keys( MAF_ADMIN_CONFIG.users || {} ).forEach( function ( id ) {
+					var o = document.createElement( 'option' );
+					o.value = id;
+					o.textContent = MAF_ADMIN_CONFIG.users[ id ];
+					select.appendChild( o );
+				} );
+			}
+		} );
+	}
+
+
 	/** Wires the filter/export toolbar controls. */
 	function wireToolbar() {
 		document.getElementById( 'maf-apply-filters' ).addEventListener( 'click', function () {
