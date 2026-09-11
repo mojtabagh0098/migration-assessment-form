@@ -375,7 +375,7 @@ class MAF_Admin {
 					<option value=""><?php esc_html_e( 'All steps', 'migration-assessment-form' ); ?></option>
 				</select>
                 
-				<input type="text" id="maf-filter-program" placeholder="<?php esc_attr_e( 'Program type', 'migration-assessment-form' ); ?>" />
+				<select type="text" id="maf-filter-program" placeholder="<?php esc_attr_e( 'Program type', 'migration-assessment-form' ); ?>">
 
 					<option value="conditional"><?php esc_html_e( 'Conditional', 'migration-assessment-form' ); ?></option>
 					<option value="approved"><?php esc_html_e( 'Approved', 'migration-assessment-form' ); ?></option>
