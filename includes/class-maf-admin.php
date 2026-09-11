@@ -331,9 +331,9 @@ class MAF_Admin {
 				'exportPdfUrl' => wp_nonce_url( admin_url( 'admin-post.php?action=maf_export_pdf' ), 'maf_export' ),
 				'forms'        => $form_options,
 				'users'        => $user_options,
-				'importance_options' => array_filter( array_map( 'trim', $opt_importance ) ),
-				'steps_options'      => array_filter( array_map( 'trim', $opt_steps ) ),
-				'programs_options'   => array_filter( array_map( 'trim', $opt_programs ) ),
+				'importance_options' => array_values( array_filter( array_map( 'trim', $opt_importance ) ) ),
+				'steps_options'      => array_values( array_filter( array_map( 'trim', $opt_steps ) ) ),
+				'programs_options'   => array_values( array_filter( array_map( 'trim', $opt_programs ) ) ),
 				'schemas'      => array_reduce( $forms, function ( $acc, $form ) {
 					$acc[ $form->ID ] = MAF_Fields::flatten( MAF_Fields::get_schema( $form->ID ) );
 					return $acc;

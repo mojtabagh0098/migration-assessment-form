@@ -71,7 +71,7 @@
 	gap: 15px 10px;
 }
 
-.maf-modal__panel .maf-modal__fields-container {
+.maf-modal__panel .maf-modal__fields-container label {
 	display: flex;
 	flex-flow: column wrap;
 }

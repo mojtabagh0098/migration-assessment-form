@@ -570,17 +570,17 @@
 				} ).join( '' ) +
 			'</select></label> ' +
 			'<label>Importance: <select id="maf-modal-importance">' +
-				MAF_ADMIN_CONFIG.importance_options.map( function ( opt ) {
+				(MAF_ADMIN_CONFIG.importance_options || []).map( function ( opt ) {
 					return '<option value="' + escapeHtml( opt ) + '"' + ( opt === ( entry.importance || 'Normal' ) ? ' selected' : '' ) + '>' + escapeHtml( opt ) + '</option>';
 				} ).join( '' ) +
 			'</select></label> ' +
 			'<label>Step: <select id="maf-modal-step">' +
-				MAF_ADMIN_CONFIG.steps_options.map( function ( opt ) {
+				(MAF_ADMIN_CONFIG.steps_options || []).map( function ( opt ) {
 					return '<option value="' + escapeHtml( opt ) + '"' + ( opt === ( entry.step || 'Assessment' ) ? ' selected' : '' ) + '>' + escapeHtml( opt ) + '</option>';
 				} ).join( '' ) +
 			'</select></label> ' +
 			'<label>Program Type: <select id="maf-modal-program_type">' +
-				MAF_ADMIN_CONFIG.programs_options.map( function ( opt ) {
+				(MAF_ADMIN_CONFIG.programs_options || []).map( function ( opt ) {
 					return '<option value="' + escapeHtml( opt ) + '"' + ( opt === ( entry.program_type || 'none' ) ? ' selected' : '' ) + '>' + escapeHtml( opt ) + '</option>';
 				} ).join( '' ) +
 			'</select></label> ' +
