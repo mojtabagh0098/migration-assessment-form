@@ -64,6 +64,13 @@
 	position: relative;
 }
 
+.maf-modal__panel .maf-modal__fields-container {
+	display: flex;
+	flex-flow: row wrap;
+	align-items: center;
+	gap: 15px 10px;
+}
+
 .maf-modal__close {
 	position: absolute;
 	top: 10px;

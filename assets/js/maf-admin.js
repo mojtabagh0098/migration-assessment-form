@@ -564,7 +564,7 @@
 
 		body.innerHTML =
 			'<h2>Entry #' + entry.id + '</h2>' +
-			'<label>Status: <select id="maf-modal-status">' +
+			'<div class="maf-modal__fields-container"><label>Status: <select id="maf-modal-status">' +
 				[ 'submitted', 'conditional', 'approved', 'rejected' ].map( function ( s ) {
 					return '<option value="' + s + '"' + ( s === entry.status ? ' selected' : '' ) + '>' + s + '</option>';
 				} ).join( '' ) +
@@ -582,7 +582,7 @@
 					return '<option value="' + id + '"' + ( id == entry.assigned_to ? ' selected' : '' ) + '>' + escapeHtml( MAF_ADMIN_CONFIG.users[ id ] ) + '</option>';
 				} ).join( '' ) +
 			'</select></label> ' +
-			'<textarea id="maf-modal-note" placeholder="Optional note…" rows="2" style="width:100%;margin-top:8px;"></textarea>' +
+			'</div><textarea id="maf-modal-note" placeholder="Optional note…" rows="2" style="width:100%;margin-top:8px;"></textarea>' +
 			'<button type="button" class="button button-primary" id="maf-modal-save" style="margin-top:8px;">Save</button>' +
 			'<span id="maf-modal-save-status"></span>' +
 			'<h3>Submitted Data</h3>' +
