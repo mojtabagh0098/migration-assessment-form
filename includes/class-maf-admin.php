@@ -345,12 +345,17 @@ class MAF_Admin {
 				}, array() ),
 				'activeLang'   => MAF_WPML::admin_active_language(),
 				'languages'    => MAF_WPML::active_languages(),
-				'i18n'         => array(
-					'confirmStatus' => __( 'Add an optional note for this status change:', 'migration-assessment-form' ),
-					'saved'         => __( 'Saved.', 'migration-assessment-form' ),
-					'error'         => __( 'Something went wrong.', 'migration-assessment-form' ),
-					'noResults'     => __( 'No entries match the current filters.', 'migration-assessment-form' ),
-					'loading'       => __( 'Loading…', 'migration-assessment-form' ),
+				'l10n'         => array(
+					'all_importance'  => __( 'All importance', 'migration-assessment-form' ),
+					'all_steps'       => __( 'All steps', 'migration-assessment-form' ),
+					'all_programs'    => __( 'All programs', 'migration-assessment-form' ),
+					'all_assigned_by' => __( 'All assigned by', 'migration-assessment-form' ),
+					'all_assigned_to' => __( 'All assigned to', 'migration-assessment-form' ),
+					'confirmStatus'   => __( 'Add an optional note for this status change:', 'migration-assessment-form' ),
+					'saved'           => __( 'Saved.', 'migration-assessment-form' ),
+					'error'           => __( 'Something went wrong.', 'migration-assessment-form' ),
+					'noResults'       => __( 'No entries match the current filters.', 'migration-assessment-form' ),
+					'loading'         => __( 'Loading…', 'migration-assessment-form' ),
 				),
 			)
 		);
@@ -382,23 +387,23 @@ class MAF_Admin {
 					<option value="rejected"><?php esc_html_e( 'Rejected', 'migration-assessment-form' ); ?></option>
 				</select>
                 
-				<select id="maf-modal-importance">
+				<select id="maf-filter-importance">
 					<option value=""><?php esc_html_e( 'All importance', 'migration-assessment-form' ); ?></option>
 				</select>
-				<select id="maf-modal-step">
+				<select id="maf-filter-step">
 					<option value=""><?php esc_html_e( 'All steps', 'migration-assessment-form' ); ?></option>
 				</select>
                 
-				<select id="maf-modal-program_type">
+				<select id="maf-filter-program_type">
 					<option value=""><?php esc_html_e( 'All programs', 'migration-assessment-form' ); ?></option>
 				</select>
 				
-				<select id="maf-modal-assigned_by">
-					<option value=""><?php esc_html_e( 'All assigned by', 'migration-assessment-form' ); ?></option>
+				<select id="maf-filter-assigned_by">
+					<option value="0"><?php esc_html_e( 'All assigned by', 'migration-assessment-form' ); ?></option>
 				</select>
 				
-				<select id="maf-modal-assigned_to">
-					<option value=""><?php esc_html_e( 'All assigned to', 'migration-assessment-form' ); ?></option>
+				<select id="maf-filter-assigned_to">
+					<option value="0"><?php esc_html_e( 'All assigned to', 'migration-assessment-form' ); ?></option>
 				</select>
 
 				<input type="text" id="maf-filter-country" placeholder="<?php esc_attr_e( 'Country of residence', 'migration-assessment-form' ); ?>" />

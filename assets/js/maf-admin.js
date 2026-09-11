@@ -30,25 +30,16 @@
 		} );
 	}
 
-	/** Fills the "language" filter <select> from WPML's active languages, defaulting to the admin-bar language. */
-	function populateLanguageFilter() {
-		var select = document.getElementById( 'maf-filter-language' );
-		Object.keys( MAF_ADMIN_CONFIG.languages || {} ).forEach( function ( code ) {
-			var opt = document.createElement( 'option' );
-			opt.value = code;
-			opt.textContent = MAF_ADMIN_CONFIG.languages[ code ];
-			select.appendChild( opt );
-		} );
-
-		if ( MAF_ADMIN_CONFIG.activeLang ) {
-			select.value = MAF_ADMIN_CONFIG.activeLang;
-		}
-	}
 
 	/** Fills the toolbar filter dropdowns (Importance, Steps, Program Type, Users) */
 	function populateToolbarFilters() {
 		// Populate Importance
-		var importanceSelect = document.getElementById( 'maf-modal-importance' );
+		var importanceSelect = document.getElementById( 'maf-filter-importance' );
+		// Add the "All importance" option at the beginning
+		var allImportanceOption = document.createElement( 'option' );
+		allImportanceOption.value = '';
+		allImportanceOption.textContent = MAF_ADMIN_CONFIG.l10n.all_importance;
+		importanceSelect.appendChild( allImportanceOption );
 		(MAF_ADMIN_CONFIG.importance_options || []).forEach( function ( opt ) {
 			var o = document.createElement( 'option' );
 			o.value = opt;
@@ -57,7 +48,12 @@
 		} );
 
 		// Populate Steps
-		var stepSelect = document.getElementById( 'maf-modal-step' );
+		var stepSelect = document.getElementById( 'maf-filter-step' );
+		// Add the "All steps" option at the beginning
+		var allStepsOption = document.createElement( 'option' );
+		allStepsOption.value = '';
+		allStepsOption.textContent = MAF_ADMIN_CONFIG.l10n.all_steps;
+		stepSelect.appendChild( allStepsOption );
 		(MAF_ADMIN_CONFIG.steps_options || []).forEach( function ( opt ) {
 			var o = document.createElement( 'option' );
 			o.value = opt;
@@ -66,7 +62,12 @@
 		} );
 
 		// Populate Program Type
-		var programSelect = document.getElementById( 'maf-modal-program_type' );
+		var programSelect = document.getElementById( 'maf-filter-program_type' );
+		// Add the "All programs" option at the beginning
+		var allProgramsOption = document.createElement( 'option' );
+		allProgramsOption.value = '';
+		allProgramsOption.textContent = MAF_ADMIN_CONFIG.l10n.all_programs;
+		programSelect.appendChild( allProgramsOption );
 		(MAF_ADMIN_CONFIG.programs_options || []).forEach( function ( opt ) {
 			var o = document.createElement( 'option' );
 			o.value = opt;
@@ -75,15 +76,34 @@
 		} );
 
 		// Populate Users (Assigned By / Assigned To)
-		var userSelects = [ document.getElementById( 'maf-modal-assigned_by' ), document.getElementById( 'maf-modal-assigned_to' ) ];
-		userSelects.forEach( function( select ) {
-			if( select ) {
-				Object.keys( MAF_ADMIN_CONFIG.users || {} ).forEach( function ( id ) {
-					var o = document.createElement( 'option' );
-					o.value = id;
-					o.textContent = MAF_ADMIN_CONFIG.users[ id ];
-					select.appendChild( o );
-				} );
+		var assignedBySelect = document.getElementById( 'maf-filter-assigned_by' );
+		var assignedToSelect = document.getElementById( 'maf-filter-assigned_to' );
+
+		// Add the "All assigned by" option at the beginning
+		var allAssignedByOption = document.createElement( 'option' );
+		allAssignedByOption.value = '0';
+		allAssignedByOption.textContent = MAF_ADMIN_CONFIG.l10n.all_assigned_by;
+		if (assignedBySelect) {
+			assignedBySelect.appendChild( allAssignedByOption );
+		}
+
+		// Add the "All assigned to" option at the beginning
+		var allAssignedToOption = document.createElement( 'option' );
+		allAssignedToOption.value = '0';
+		allAssignedToOption.textContent = MAF_ADMIN_CONFIG.l10n.all_assigned_to;
+		if (assignedToSelect) {
+			assignedToSelect.appendChild( allAssignedToOption );
+		}
+
+		Object.keys( MAF_ADMIN_CONFIG.users || {} ).forEach( function ( id ) {
+			var o = document.createElement( 'option' );
+			o.value = id;
+			o.textContent = MAF_ADMIN_CONFIG.users[ id ];
+			if (assignedBySelect) {
+				assignedBySelect.appendChild( o.cloneNode(true) ); // Clone for Assigned By
+			}
+			if (assignedToSelect) {
+				assignedToSelect.appendChild( o.cloneNode(true) ); // Clone for Assigned To
 			}
 		} );
 	}
@@ -106,7 +126,7 @@
 		} );
 
 		updateExportLinks();
-		[ 'maf-filter-form', 'maf-filter-language', 'maf-filter-status', 'maf-filter-country', 'maf-filter-search' ].forEach( function ( id ) {
+		[ 'maf-filter-form', 'maf-filter-status', 'maf-filter-country', 'maf-filter-search', 'maf-filter-importance', 'maf-filter-step', 'maf-filter-program_type', 'maf-filter-assigned_by', 'maf-filter-assigned_to' ].forEach( function ( id ) {
 			document.getElementById( id ).addEventListener( 'change', updateExportLinks );
 		} );
 
@@ -129,10 +149,14 @@
 		if ( resetBtn ) {
 			resetBtn.addEventListener( 'click', function () {
 				document.getElementById( 'maf-filter-form' ).value = '';
-				document.getElementById( 'maf-filter-language' ).value = MAF_ADMIN_CONFIG.activeLang || '';
 				document.getElementById( 'maf-filter-status' ).value = '';
 				document.getElementById( 'maf-filter-country' ).value = '';
 				document.getElementById( 'maf-filter-search' ).value = '';
+				document.getElementById( 'maf-filter-importance' ).value = '';
+				document.getElementById( 'maf-filter-step' ).value = '';
+				document.getElementById( 'maf-filter-program_type' ).value = '';
+				document.getElementById( 'maf-filter-assigned_by' ).value = '';
+				document.getElementById( 'maf-filter-assigned_to' ).value = '';
 				document.getElementById( 'maf-filter-rows-container' ).innerHTML = '';
 				state.page = 1;
 				fetchEntries();
@@ -258,11 +282,11 @@
 			'maf-filter-status': 'status',
 			'maf-filter-country': 'country_residence',
 			'maf-filter-search': 'search',
-			'maf-modal-importance': 'importance',
-			'maf-modal-step': 'step',
-			'maf-modal-program_type': 'program_type',
-			'maf-modal-assigned_by': 'assigned_by',
-			'maf-modal-assigned_to': 'assigned_to',
+			'maf-filter-importance': 'importance',
+			'maf-filter-step': 'step',
+			'maf-filter-program_type': 'program_type',
+			'maf-filter-assigned_by': 'assigned_by',
+			'maf-filter-assigned_to': 'assigned_to',
 		};
 		Object.keys( map ).forEach( function ( id ) {
 			var val = document.getElementById( id ).value;
