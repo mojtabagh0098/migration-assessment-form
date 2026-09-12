@@ -26,6 +26,12 @@ class MAF_Activator {
 		$cpt = new MAF_CPT();
 		$cpt->register_post_type();
 
+		// Set default options
+		add_option( 'maf_option_importance', "Normal\nImportant\nUrgent" );
+		add_option( 'maf_option_steps', "Assessment\nassessment follow up\nCancelled\nContract follow up\ncontract signed\ncompleted\n1st payment in process\nprocessing fee payment\n2nd payment in process\nConsulting or initial contract fee\ncosulting or initial cont. fee payment" );
+		add_option( 'maf_option_program_types', "Quebec Investor\nPEQ\nFederal Self Employed\nExpress Entry\nQuebec Skilled Worker\nSponsorship\nStudent\nSuper Visa\nVisitor Visa\nSaskatchewan Business\nNova Scotia Business\nBritish Columbia Business\nPEI Entrepreneur\nManitoba Entrepreneur\nQuebec Entrepreneur\nMorden\nCanadian experience class\nstart up visa" );
+		add_option( 'maf_option_statuses', "Submitted\nConditional\nQualifed\nNot Qualified\nMissing info" );
+
 		flush_rewrite_rules();
 	}
 

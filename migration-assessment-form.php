@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name:       Migration Assessment Form
- * Plugin URI:        https://example.com/migration-assessment-form
+ * Plugin URI:        https://ghazinejad.ir/migration-assessment-form
  * Description:       افزونه اختصاصی فرم ارزیابی مهاجرت با پشتیبانی کامل از WPML، پنل مدیریت ورودی‌ها، لاگ تغییرات و خروجی CSV/PDF. فرانت و پنل ادمین کاملاً با Vanilla JS پیاده‌سازی شده‌اند.
- * Version:           1.1.0
+ * Version:           2.3.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Mojtaba Ghazi Nejad

@@ -89,17 +89,35 @@ class MAF_Export {
 		fwrite( $output, "\xEF\xBB\xBF" );
 
 		$columns = array(
-			'id', 'form_id', 'language', 'status', 'first_name', 'last_name', 'email',
-			'phone', 'age', 'country_residence', 'country_citizenship', 'marital_status',
-			'net_worth_cad', 'created_at',
+			'id'           => 'ID',
+			'form_id'      => 'Form',
+			'first_name'   => 'First Name',
+			'last_name'    => 'Last Name',
+			'email'        => 'Email',
+			'phone'        => 'Phone',
+			'step'         => 'Step',
+			'status'       => 'Status',
+			'program_type' => 'Program Type',
+			'created_at'   => 'Date',
 		);
 
-		fputcsv( $output, $columns );
+		// Get form names for the form_id column
+		$forms = get_posts( array( 'post_type' => 'maf_form', 'posts_per_page' => -1 ) );
+		$form_names = array();
+		foreach ( $forms as $f ) {
+			$form_names[ $f->ID ] = $f->post_title;
+		}
+
+		fputcsv( $output, array_values( $columns ) );
 
 		foreach ( $entries as $entry ) {
 			$row = array();
-			foreach ( $columns as $col ) {
-				$row[] = $entry[ $col ] ?? '';
+			foreach ( array_keys( $columns ) as $col ) {
+				if ( 'form_id' === $col ) {
+					$row[] = $form_names[ $entry[ $col ] ] ?? $entry[ $col ];
+				} else {
+					$row[] = $entry[ $col ] ?? '';
+				}
 			}
 			fputcsv( $output, $row );
 		}
@@ -129,17 +147,27 @@ class MAF_Export {
 		$pdf = new MAF_Simple_PDF();
 		$pdf->add_title( __( 'Assessment Entries', 'migration-assessment-form' ) );
 
-		$header = array( 'ID', 'Name', 'Email', 'Phone', 'Country', 'Status', 'Date' );
+		// Get form names
+		$forms = get_posts( array( 'post_type' => 'maf_form', 'posts_per_page' => -1 ) );
+		$form_names = array();
+		foreach ( $forms as $f ) {
+			$form_names[ $f->ID ] = $f->post_title;
+		}
+
+		$header = array( 'ID', 'Form', 'First Name', 'Last Name', 'Email', 'Phone', 'Step', 'Status', 'Prog. Type', 'Date' );
 		$rows   = array();
 
 		foreach ( $entries as $entry ) {
 			$rows[] = array(
 				$entry['id'],
-				trim( $entry['first_name'] . ' ' . $entry['last_name'] ),
+				$form_names[ $entry['form_id'] ] ?? $entry['form_id'],
+				$entry['first_name'],
+				$entry['last_name'],
 				$entry['email'],
 				$entry['phone'],
-				$entry['country_residence'],
+				$entry['step'],
 				$entry['status'],
+				$entry['program_type'],
 				$entry['created_at'],
 			);
 		}

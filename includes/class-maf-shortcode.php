@@ -78,6 +78,11 @@ class MAF_Shortcode {
 
 		$this->enqueue_assets();
 
+		$custom_css = get_option( 'maf_custom_css' );
+		if ( ! empty( $custom_css ) ) {
+			echo '<style>' . wp_strip_all_tags( $custom_css ) . '</style>';
+		}
+
 		$schema         = MAF_Fields::get_schema( $form_id );
 		$success_message = $schema['settings']['success_message'] ?? '';
 		$sections       = $schema['sections'] ?? $schema;

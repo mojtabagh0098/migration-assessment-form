@@ -1081,9 +1081,6 @@
 		}
 
 		var toggles = el( 'div', { class: 'maf-b-toggles' } );
-		if ( supports( 'required' ) ) {
-			toggles.appendChild( toggle( I18N.required, !! field.required, function ( on ) { update( function ( f ) { on ? f.required = true : delete f.required; } ); } ) );
-		}
 		if ( supports( 'inline' ) ) {
 			toggles.appendChild( toggle( I18N.inline, !! field.inline, function ( on ) { update( function ( f ) { on ? f.inline = true : delete f.inline; } ); } ) );
 		}
@@ -1158,27 +1155,44 @@
 		if ( ! def.static ) {
 			var customRow = el( 'div', { class: 'maf-b-row' } );
 			customRow.appendChild( control( 'Element ID', textInput( field.custom_id || '', function ( v ) { update( function ( f ) { v ? f.custom_id = v.replace(/[^a-z0-9_-]/gi, '') : delete f.custom_id; } ); }, { class: 'small-text code' } ) ) );
+			customRow.appendChild( control( 'CSS Class', textInput( field.custom_class || '', function ( v ) { update( function ( f ) { v ? f.custom_class = v : delete f.custom_class; } ); } ) ) );
 			pane.appendChild( customRow );
-			pane.appendChild( control( 'CSS Class', textInput( field.custom_class || '', function ( v ) { update( function ( f ) { v ? f.custom_class = v : delete f.custom_class; } ); } ) ) );
 		}
 
-		if ( supports( 'min' ) || supports( 'maxlength' ) || supports( 'rows' ) ) {
-			var row = el( 'div', { class: 'maf-b-row' } );
+		if ( supports( 'min' ) || supports( 'maxlength' ) || supports( 'rows' ) || supports( 'required' ) ) {
 			var numType = field.type === 'date' ? 'date' : 'number';
+			
+			// Row 1: Min & Max (if applicable)
 			if ( supports( 'min' ) ) {
-				row.appendChild( control( I18N.min, textInput( field.min, function ( v ) { update( function ( f ) { v === '' ? delete f.min : f.min = numType === 'number' ? Number( v ) : v; } ); }, { type: numType, class: 'small-text' } ) ) );
-				row.appendChild( control( I18N.max, textInput( field.max, function ( v ) { update( function ( f ) { v === '' ? delete f.max : f.max = numType === 'number' ? Number( v ) : v; } ); }, { type: numType, class: 'small-text' } ) ) );
+				var minMaxRow = el( 'div', { class: 'maf-b-row' } );
+				minMaxRow.appendChild( control( I18N.min, textInput( field.min, function ( v ) { update( function ( f ) { v === '' ? delete f.min : f.min = numType === 'number' ? Number( v ) : v; } ); }, { type: numType, class: 'small-text' } ) ) );
+				minMaxRow.appendChild( control( I18N.max, textInput( field.max, function ( v ) { update( function ( f ) { v === '' ? delete f.max : f.max = numType === 'number' ? Number( v ) : v; } ); }, { type: numType, class: 'small-text' } ) ) );
+				pane.appendChild( minMaxRow );
 			}
-			if ( supports( 'step' ) ) {
-				row.appendChild( control( I18N.step, textInput( field.step, function ( v ) { update( function ( f ) { v === '' ? delete f.step : f.step = Number( v ); } ); }, { type: 'number', class: 'small-text', step: 'any' } ) ) );
+
+			// Row 2: Max length & Required
+			if ( supports( 'maxlength' ) || supports( 'required' ) ) {
+				var reqMaxRow = el( 'div', { class: 'maf-b-row' } );
+				if ( supports( 'maxlength' ) ) {
+					reqMaxRow.appendChild( control( I18N.maxlength, textInput( field.maxlength, function ( v ) { update( function ( f ) { v === '' ? delete f.maxlength : f.maxlength = parseInt( v, 10 ); } ); }, { type: 'number', class: 'small-text', min: 1 } ) ) );
+				}
+				if ( supports( 'required' ) ) {
+					reqMaxRow.appendChild( toggle( I18N.required, !! field.required, function ( on ) { update( function ( f ) { on ? f.required = true : delete f.required; } ); } ) );
+				}
+				pane.appendChild( reqMaxRow );
 			}
-			if ( supports( 'maxlength' ) ) {
-				row.appendChild( control( I18N.maxlength, textInput( field.maxlength, function ( v ) { update( function ( f ) { v === '' ? delete f.maxlength : f.maxlength = parseInt( v, 10 ); } ); }, { type: 'number', class: 'small-text', min: 1 } ) ) );
+
+			// Additional rows for step/rows if they exist
+			if ( supports( 'step' ) || supports( 'rows' ) ) {
+				var miscRow = el( 'div', { class: 'maf-b-row' } );
+				if ( supports( 'step' ) ) {
+					miscRow.appendChild( control( I18N.step, textInput( field.step, function ( v ) { update( function ( f ) { v === '' ? delete f.step : f.step = Number( v ); } ); }, { type: 'number', class: 'small-text', step: 'any' } ) ) );
+				}
+				if ( supports( 'rows' ) ) {
+					miscRow.appendChild( control( I18N.rows, textInput( field.rows, function ( v ) { update( function ( f ) { v === '' ? delete f.rows : f.rows = parseInt( v, 10 ); } ); }, { type: 'number', class: 'small-text', min: 1 } ) ) );
+				}
+				pane.appendChild( miscRow );
 			}
-			if ( supports( 'rows' ) ) {
-				row.appendChild( control( I18N.rows, textInput( field.rows, function ( v ) { update( function ( f ) { v === '' ? delete f.rows : f.rows = parseInt( v, 10 ); } ); }, { type: 'number', class: 'small-text', min: 1 } ) ) );
-			}
-			pane.appendChild( row );
 		}
 
 		if ( supports( 'options' ) ) {

@@ -103,6 +103,9 @@ class MAF_Admin {
 			update_option( 'maf_option_program_types', sanitize_textarea_field( $_POST['maf_option_program_types'] ) );
 			update_option( 'maf_option_statuses', sanitize_textarea_field( $_POST['maf_option_statuses'] ) );
 			
+			// Save Custom CSS
+			update_option( 'maf_custom_css', wp_strip_all_tags( $_POST['maf_custom_css'] ) );
+			
 			if ( class_exists( 'MAF_Email' ) ) {
 				MAF_Email::reschedule_cron();
 			}
@@ -246,7 +249,7 @@ class MAF_Admin {
 					<tr>
 						<th scope="row"><label for="maf_option_program_types"><?php esc_html_e( 'Program Type Options', 'migration-assessment-form' ); ?></label></th>
 						<td>
-							<textarea name="maf_option_program_types" id="maf_option_program_types" rows="6" class="large-text"><?php echo esc_textarea( $opt_programs ); ?></textarea>
+							<textarea name="maf_option_program_types" id="maf_option_program_types" rows="6" class="large-text"><?php echo esc_textarea( $opt_programs_raw ); ?></textarea>
 							<p class="description"><?php esc_html_e( 'One per line.', 'migration-assessment-form' ); ?></p>
 						</td>
 					</tr>
@@ -255,6 +258,13 @@ class MAF_Admin {
 						<td>
 							<textarea name="maf_option_statuses" id="maf_option_statuses" rows="4" class="large-text"><?php echo esc_textarea( $opt_statuses ); ?></textarea>
 							<p class="description"><?php esc_html_e( 'One per line.', 'migration-assessment-form' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="maf_custom_css"><?php esc_html_e( 'Custom CSS', 'migration-assessment-form' ); ?></label></th>
+						<td>
+							<textarea name="maf_custom_css" id="maf_custom_css" rows="10" class="large-text code"><?php echo esc_textarea( get_option( 'maf_custom_css' ) ); ?></textarea>
+							<p class="description"><?php esc_html_e( 'Enter your custom CSS here. It will be injected into all forms.', 'migration-assessment-form' ); ?></p>
 						</td>
 					</tr>
 					<tr>
