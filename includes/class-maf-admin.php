@@ -97,17 +97,18 @@ class MAF_Admin {
 			update_option( 'maf_template_admin_notification', wp_kses_post( $_POST['maf_template_admin_notification'] ) );
 			update_option( 'maf_template_daily_summary', wp_kses_post( $_POST['maf_template_daily_summary'] ) );
 			
+			// Save Options for Dropdowns
+			update_option( 'maf_option_importance', sanitize_textarea_field( $_POST['maf_option_importance'] ) );
+			update_option( 'maf_option_steps', sanitize_textarea_field( $_POST['maf_option_steps'] ) );
+			update_option( 'maf_option_program_types', sanitize_textarea_field( $_POST['maf_option_program_types'] ) );
+			update_option( 'maf_option_statuses', sanitize_textarea_field( $_POST['maf_option_statuses'] ) );
+			
 			if ( class_exists( 'MAF_Email' ) ) {
 				MAF_Email::reschedule_cron();
 			}
 
 			echo '<div class="notice notice-success"><p>' . esc_html__( 'Settings saved.', 'migration-assessment-form' ) . '</p></div>';
 		}
-			// Save Options for Dropdowns
-			update_option( 'maf_option_importance', sanitize_textarea_field( $_POST['maf_option_importance'] ) );
-			update_option( 'maf_option_steps', sanitize_textarea_field( $_POST['maf_option_steps'] ) );
-			update_option( 'maf_option_program_types', sanitize_textarea_field( $_POST['maf_option_program_types'] ) );
-			update_option( 'maf_option_statuses', sanitize_textarea_field( $_POST['maf_option_statuses'] ) );
 		// Get Saved Options
 		$opt_importance = get_option( 'maf_option_importance', "Normal\nImportant\nUrgent" );
 		$opt_steps      = get_option( 'maf_option_steps', "Assessment\nassessment follow up\nCancelled\nContract follow up\ncontract signed\ncompleted\n1st payment in process\nprocessing fee payment\n2nd payment in process\nConsulting or initial contract fee\ncosulting or initial cont. fee payment" );
