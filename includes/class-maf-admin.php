@@ -224,6 +224,10 @@ class MAF_Admin {
 						<th scope="row"><label><?php esc_html_e( 'Daily Report Time', 'migration-assessment-form' ); ?></label></th>
 						<td>
 							<input name="maf_email_hour" type="number" id="maf_email_hour" value="<?php echo esc_attr( $hour ); ?>" min="0" max="23" style="width: 60px;" /> :
+							<input name="maf_email_minute" type="number" id="maf_email_minute" value="<?php echo esc_attr( $minute ); ?>" min="0" max="59" style="width: 60px;" />
+							<p class="description"><?php esc_html_e( 'Time of the day (24-hour format) when the daily report will be sent (HH:MM).', 'migration-assessment-form' ); ?></p>
+						</td>
+					</tr>
 					<tr>
 						<th scope="row"><label for="maf_option_importance"><?php esc_html_e( 'Importance Options', 'migration-assessment-form' ); ?></label></th>
 						<td>
@@ -250,11 +254,6 @@ class MAF_Admin {
 						<td>
 							<textarea name="maf_option_statuses" id="maf_option_statuses" rows="4" class="large-text"><?php echo esc_textarea( $opt_statuses ); ?></textarea>
 							<p class="description"><?php esc_html_e( 'One per line.', 'migration-assessment-form' ); ?></p>
-						</td>
-					</tr>
-
-							<input name="maf_email_minute" type="number" id="maf_email_minute" value="<?php echo esc_attr( $minute ); ?>" min="0" max="59" style="width: 60px;" />
-							<p class="description"><?php esc_html_e( 'Time of the day (24-hour format) when the daily report will be sent (HH:MM).', 'migration-assessment-form' ); ?></p>
 						</td>
 					</tr>
 					<tr>
