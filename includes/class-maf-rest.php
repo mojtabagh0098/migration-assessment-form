@@ -885,8 +885,12 @@ class MAF_REST {
 		$formats = array();
 
 		if ( isset( $body['status'] ) ) {
-			$new_status = sanitize_key( $body['status'] );
-			$allowed    = array( 'submitted', 'conditional', 'approved', 'rejected' );
+			$new_status = sanitize_text_field( $body['status'] );
+			
+			$saved_statuses = get_option( 'maf_option_statuses' );
+			$allowed = !empty($saved_statuses) ? explode("\n", str_replace("\r", "", $saved_statuses)) : array( 'submitted', 'conditional', 'approved', 'rejected' );
+			$allowed = array_values(array_filter(array_map('trim', $allowed)));
+			
 			if ( in_array( $new_status, $allowed, true ) && $new_status !== $existing['status'] ) {
 				MAF_Audit::log( $id, 'status', $existing['status'], $new_status, $note );
 				$update['status'] = $new_status;

@@ -47,6 +47,20 @@
 			importanceSelect.appendChild( o );
 		} );
 
+		// Populate Status
+		var statusSelect = document.getElementById( 'maf-filter-status' );
+		// Add the "All statuses" option at the beginning
+		var allStatusesOption = document.createElement( 'option' );
+		allStatusesOption.value = '';
+		allStatusesOption.textContent = MAF_ADMIN_CONFIG.i18n.all_statuses;
+		statusSelect.appendChild( allStatusesOption );
+		(MAF_ADMIN_CONFIG.status_options || []).forEach( function ( opt ) {
+			var o = document.createElement( 'option' );
+			o.value = opt;
+			o.textContent = opt;
+			statusSelect.appendChild( o );
+		} );
+
 		// Populate Steps
 		var stepSelect = document.getElementById( 'maf-filter-step' );
 		// Add the "All steps" option at the beginning
@@ -641,8 +655,8 @@
 		body.innerHTML =
 			'<h2>Entry #' + entry.id + '</h2>' +
 			'<div class="maf-modal__fields-container"><label>Status: <select id="maf-modal-status">' +
-				[ 'submitted', 'conditional', 'approved', 'rejected' ].map( function ( s ) {
-					return '<option value="' + s + '"' + ( s === entry.status ? ' selected' : '' ) + '>' + s + '</option>';
+				(MAF_ADMIN_CONFIG.status_options || []).map( function ( s ) {
+					return '<option value="' + escapeHtml( s ) + '"' + ( s === entry.status ? ' selected' : '' ) + '>' + escapeHtml( s ) + '</option>';
 				} ).join( '' ) +
 			'</select></label> ' +
 			'<label>Importance: <select id="maf-modal-importance">' +

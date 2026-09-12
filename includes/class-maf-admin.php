@@ -325,6 +325,9 @@ class MAF_Admin {
 		$saved_programs   = get_option( 'maf_option_program_types' );
 		$opt_programs     = explode( "\n", str_replace( "\r", "", !empty($saved_programs) ? $saved_programs : "Quebec Investor\nPEQ\nFederal Self Employed\nExpress Entry\nQuebec Skilled Worker\nSponsorship\nStudent\nSuper Visa\nVisitor Visa\nSaskatchewan Business\nNova Scotia Business\nBritish Columbia Business\nPEI Entrepreneur\nManitoba Entrepreneur\nQuebec Entrepreneur\nMorden\nCanadian experience class\nstart up visa" ) );
 
+		$saved_statuses   = get_option( 'maf_option_statuses' );
+		$opt_statuses     = explode( "\n", str_replace( "\r", "", !empty($saved_statuses) ? $saved_statuses : "Submitted\nConditional\nQualifed\nNot Qualified\nMissing info" ) );
+
 		wp_localize_script(
 			'maf-admin',
 			'MAF_ADMIN_CONFIG',
@@ -338,6 +341,7 @@ class MAF_Admin {
 				'importance_options' => array_values( array_filter( array_map( 'trim', $opt_importance ) ) ),
 				'steps_options'      => array_values( array_filter( array_map( 'trim', $opt_steps ) ) ),
 				'programs_options'   => array_values( array_filter( array_map( 'trim', $opt_programs ) ) ),
+				'status_options'     => array_values( array_filter( array_map( 'trim', $opt_statuses ) ) ),
 				'schemas'      => array_reduce( $forms, function ( $acc, $form ) {
 					$acc[ $form->ID ] = MAF_Fields::flatten( MAF_Fields::get_schema( $form->ID ) );
 					return $acc;
@@ -348,6 +352,7 @@ class MAF_Admin {
 						'all_importance'  => __( 'All importance', 'migration-assessment-form' ),
 						'all_steps'       => __( 'All steps', 'migration-assessment-form' ),
 						'all_programs'    => __( 'All programs', 'migration-assessment-form' ),
+						'all_statuses'    => __( 'All statuses', 'migration-assessment-form' ),
 						'all_assigned_by' => __( 'All assigned by', 'migration-assessment-form' ),
 						'all_assigned_to' => __( 'All assigned to', 'migration-assessment-form' ),
 						'confirmStatus'   => __( 'Add an optional note for this status change:', 'migration-assessment-form' ),
@@ -380,10 +385,6 @@ class MAF_Admin {
 
 				<select id="maf-filter-status">
 					<option value=""><?php esc_html_e( 'All statuses', 'migration-assessment-form' ); ?></option>
-					<option value="submitted"><?php esc_html_e( 'Submitted', 'migration-assessment-form' ); ?></option>
-					<option value="conditional"><?php esc_html_e( 'Conditional', 'migration-assessment-form' ); ?></option>
-					<option value="approved"><?php esc_html_e( 'Approved', 'migration-assessment-form' ); ?></option>
-					<option value="rejected"><?php esc_html_e( 'Rejected', 'migration-assessment-form' ); ?></option>
 				</select>
                 
 				<select id="maf-filter-importance">
