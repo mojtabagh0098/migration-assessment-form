@@ -381,30 +381,23 @@ class MAF_Admin {
 
 			<div class="maf-toolbar">
 				<select id="maf-filter-form">
-					<option value=""><?php esc_html_e( 'All forms', 'migration-assessment-form' ); ?></option>
 				</select>
 
 				<select id="maf-filter-status">
-					<option value=""><?php esc_html_e( 'All statuses', 'migration-assessment-form' ); ?></option>
 				</select>
                 
 				<select id="maf-filter-importance">
-					<option value=""><?php esc_html_e( 'All importance', 'migration-assessment-form' ); ?></option>
 				</select>
 				<select id="maf-filter-step">
-					<option value=""><?php esc_html_e( 'All steps', 'migration-assessment-form' ); ?></option>
 				</select>
                 
 				<select id="maf-filter-program_type">
-					<option value=""><?php esc_html_e( 'All programs', 'migration-assessment-form' ); ?></option>
 				</select>
 				
 				<select id="maf-filter-assigned_by">
-					<option value="0"><?php esc_html_e( 'All assigned by', 'migration-assessment-form' ); ?></option>
 				</select>
 				
 				<select id="maf-filter-assigned_to">
-					<option value="0"><?php esc_html_e( 'All assigned to', 'migration-assessment-form' ); ?></option>
 				</select>
 
 				<input type="text" id="maf-filter-country" placeholder="<?php esc_attr_e( 'Country of residence', 'migration-assessment-form' ); ?>" />
