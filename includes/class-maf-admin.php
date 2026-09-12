@@ -47,6 +47,14 @@ class MAF_Admin {
 			'maf_main_menu',
 			array( $this, 'render_entries_page' )
 		);
+
+		add_submenu_page(
+			'maf_main_menu',
+			__( 'All Forms', 'migration-assessment-form' ),
+			__( 'All Forms', 'migration-assessment-form' ),
+			'manage_options',
+			'edit.php?post_type=' . MAF_CPT::POST_TYPE
+		);
 		
 		add_submenu_page(
 			'maf_main_menu',
