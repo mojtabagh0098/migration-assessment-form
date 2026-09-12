@@ -520,21 +520,25 @@
 		tbody.innerHTML = '';
 
 		if ( ! result.entries || ! result.entries.length ) {
-			tbody.innerHTML = '<tr><td colspan="8">' + MAF_ADMIN_CONFIG.i18n.noResults + '</td></tr>';
+			tbody.innerHTML = '<tr><td colspan="11">' + MAF_ADMIN_CONFIG.i18n.noResults + '</td></tr>';
 			document.getElementById( 'maf-pagination' ).innerHTML = '';
 			return;
 		}
 
 		result.entries.forEach( function ( entry ) {
 			var tr = document.createElement( 'tr' );
+			var formName = ( MAF_ADMIN_CONFIG.forms && MAF_ADMIN_CONFIG.forms[ entry.form_id ] ) ? MAF_ADMIN_CONFIG.forms[ entry.form_id ] : '—';
 			tr.innerHTML =
 				'<td>' + escapeHtml( entry.id ) + '</td>' +
-				'<td>' + escapeHtml( ( entry.first_name + ' ' + entry.last_name ).trim() ) + '</td>' +
-				'<td>' + escapeHtml( entry.email ) + '</td>' +
-				'<td>' + escapeHtml( entry.country_residence ) + '</td>' +
-				'<td>' + escapeHtml( ( entry.language || '' ).toUpperCase() ) + '</td>' +
+				'<td>' + escapeHtml( formName ) + '</td>' +
+				'<td>' + escapeHtml( entry.first_name || '' ) + '</td>' +
+				'<td>' + escapeHtml( entry.last_name || '' ) + '</td>' +
+				'<td>' + escapeHtml( entry.email || '' ) + '</td>' +
+				'<td>' + escapeHtml( entry.phone || '' ) + '</td>' +
+				'<td>' + escapeHtml( entry.step || '' ) + '</td>' +
 				'<td><span class="maf-status maf-status--' + escapeHtml( entry.status ) + '">' + escapeHtml( entry.status ) + '</span></td>' +
-				'<td>' + escapeHtml( entry.created_at ) + '</td>' +
+				'<td>' + escapeHtml( entry.program_type || '' ) + '</td>' +
+				'<td>' + escapeHtml( entry.created_at || '' ) + '</td>' +
 				'<td><button type="button" class="button button-small maf-view-entry" data-id="' + entry.id + '">' + 'View' + '</button></td>';
 
 			tr.querySelector( '.maf-view-entry' ).addEventListener( 'click', function () {

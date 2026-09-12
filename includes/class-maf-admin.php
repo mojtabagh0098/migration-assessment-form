@@ -430,17 +430,20 @@ class MAF_Admin {
 				<thead>
 					<tr>
 						<th><?php esc_html_e( 'ID', 'migration-assessment-form' ); ?></th>
-						<th><?php esc_html_e( 'Name', 'migration-assessment-form' ); ?></th>
+						<th><?php esc_html_e( 'Form', 'migration-assessment-form' ); ?></th>
+						<th><?php esc_html_e( 'First Name', 'migration-assessment-form' ); ?></th>
+						<th><?php esc_html_e( 'Last Name', 'migration-assessment-form' ); ?></th>
 						<th><?php esc_html_e( 'Email', 'migration-assessment-form' ); ?></th>
-						<th><?php esc_html_e( 'Country', 'migration-assessment-form' ); ?></th>
-						<th><?php esc_html_e( 'Language', 'migration-assessment-form' ); ?></th>
+						<th><?php esc_html_e( 'Phone', 'migration-assessment-form' ); ?></th>
+						<th><?php esc_html_e( 'Step', 'migration-assessment-form' ); ?></th>
 						<th><?php esc_html_e( 'Status', 'migration-assessment-form' ); ?></th>
-						<th><?php esc_html_e( 'Submitted', 'migration-assessment-form' ); ?></th>
+						<th><?php esc_html_e( 'Program Type', 'migration-assessment-form' ); ?></th>
+						<th><?php esc_html_e( 'Date', 'migration-assessment-form' ); ?></th>
 						<th><?php esc_html_e( 'Actions', 'migration-assessment-form' ); ?></th>
 					</tr>
 				</thead>
 				<tbody id="maf-entries-tbody">
-					<tr><td colspan="8"><?php esc_html_e( 'Loading…', 'migration-assessment-form' ); ?></td></tr>
+					<tr><td colspan="11"><?php esc_html_e( 'Loading…', 'migration-assessment-form' ); ?></td></tr>
 				</tbody>
 			</table>
 
