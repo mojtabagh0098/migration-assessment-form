@@ -215,7 +215,7 @@
 						rowEl.classList.toggle( 'is-collapsed' );
 					} );
 					// Initially collapsed.
-					rowEl.classList.add( 'is-collapsed' );
+					// rowEl.classList.add( 'is-collapsed' );
 				}
 
 
