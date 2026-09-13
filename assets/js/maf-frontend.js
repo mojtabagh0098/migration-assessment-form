@@ -208,6 +208,16 @@
 						refresh();
 					}, 150 );
 				} );
+				// Toggle button logic.
+				var toggleBtn = rowEl.querySelector( '.maf-repeater__toggle' );
+				if ( toggleBtn ) {
+					toggleBtn.addEventListener( 'click', function () {
+						rowEl.classList.toggle( 'is-collapsed' );
+					} );
+					// Initially collapsed.
+					rowEl.classList.add( 'is-collapsed' );
+				}
+
 
 				rowsContainer.appendChild( clone );
 				initPhoneInputs( rowEl );

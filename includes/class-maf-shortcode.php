@@ -33,8 +33,13 @@ class MAF_Shortcode {
 		wp_enqueue_style( 'maf-intl-tel-input', 'https://cdn.jsdelivr.net/npm/intl-tel-input@23/build/css/intlTelInput.css', array(), '23.0.0' );
 		wp_enqueue_script( 'maf-intl-tel-input', 'https://cdn.jsdelivr.net/npm/intl-tel-input@23/build/js/intlTelInputWithUtils.min.js', array(), '23.0.0', true );
 
-		wp_enqueue_style( 'maf-frontend', MAF_PLUGIN_URL . 'assets/css/maf-frontend.css', array(), MAF_VERSION );
-		wp_enqueue_script( 'maf-frontend', MAF_PLUGIN_URL . 'assets/js/maf-frontend.js', array( 'maf-intl-tel-input' ), MAF_VERSION, true );
+		// Enqueue jQuery (Select2 dependency) and Select2 itself from CDN.
+		wp_enqueue_script( 'jquery' );
+		wp_enqueue_style( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), '4.1.0' );
+		wp_enqueue_script( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array( 'jquery' ), '4.1.0', true );
+
+		wp_enqueue_style( 'maf-frontend', MAF_PLUGIN_URL . 'assets/css/maf-frontend.css', array( 'select2' ), MAF_VERSION );
+		wp_enqueue_script( 'maf-frontend', MAF_PLUGIN_URL . 'assets/js/maf-frontend.js', array( 'maf-intl-tel-input', 'select2', 'jquery' ), MAF_VERSION, true );
 
 		wp_localize_script(
 			'maf-frontend',
@@ -108,6 +113,12 @@ class MAF_Shortcode {
 						<?php endif; ?>
 					</div>
 				</section>
+					<button type="button" class="maf-repeater__toggle">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<polyline points="6 9 12 15 18 9"></polyline>
+						</svg>
+					</button>
+
 			<?php endforeach; ?>
 
 
@@ -320,12 +331,20 @@ class MAF_Shortcode {
 
 			<template class="maf-repeater__template">
 				<div class="maf-repeater__row">
-					<button type="button" class="maf-repeater__remove">
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path d="M6.72656 17.2729L17.2725 6.72705" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-							<path d="M17.2725 17.2729L6.72656 6.72705" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-						</svg>
-					</button>
+					<div class="maf-repeater__row-actions">
+						<button type="button" class="maf-repeater__toggle">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<polyline points="6 9 12 15 18 9"></polyline>
+							</svg>
+						</button>
+						<button type="button" class="maf-repeater__remove">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+								<path d="M6.72656 17.2729L17.2725 6.72705" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+								<path d="M17.2725 17.2729L6.72656 6.72705" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</button>
+					</div>
+
 					<div class="maf-grid">
 						<?php foreach ( $section['fields'] as $field ) : ?>
 							<?php $this->render_field( $field, $section['id'] . '[__INDEX__]' ); ?>

@@ -1426,7 +1426,11 @@
 			var grid = el( 'div', { class: 'maf-grid' } );
 			sec.fields.forEach( function ( f ) { grid.appendChild( previewField( f ) ); } );
 			if ( sec.repeater ) {
-				var rowEl = el( 'div', { class: 'maf-repeater__row' }, [ grid, el( 'button', { type: 'button', class: 'maf-repeater__remove', text: '×' } ) ] );
+				var actionsEl = el( 'div', { class: 'maf-repeater__row-actions' }, [
+					el( 'button', { type: 'button', class: 'maf-repeater__toggle', text: '▾' } ),
+					el( 'button', { type: 'button', class: 'maf-repeater__remove', text: '×' } )
+				] );
+				var rowEl = el( 'div', { class: 'maf-repeater__row' }, [ actionsEl, grid ] );
 				card.appendChild( el( 'div', { class: 'maf-repeater' }, [ rowEl, el( 'button', { type: 'button', class: 'maf-repeater__add', text: '+ ' + ( sec.row_label || sec.title ) } ) ] ) );
 			} else {
 				card.appendChild( grid );

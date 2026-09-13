@@ -94,21 +94,60 @@
 .maf-repeater__row {
 	border: 1px dashed #c3c4c7;
 	border-radius: 8px;
-	padding: 16px;
+	padding: 44px 16px 16px;
 	margin-bottom: 12px;
 	position: relative;
 }
+.maf-repeater__row-actions {
+	display: flex;
+	gap: 6px;
+	position: absolute;
+	top: 8px;
+	inset-inline-end: 8px;
+}
 
 .maf-repeater__remove {
-	margin-top: 10px;
 	background: none;
 	border: 1px solid #d63638;
 	color: #d63638;
 	border-radius: 6px;
-	padding: 6px 12px;
+	width: 28px;
+	height: 28px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	cursor: pointer;
-	font-size: 13px;
+	padding: 0;
 }
+.maf-repeater__remove svg {
+	width: 16px;
+	height: 16px;
+}
+.maf-repeater__toggle {
+	background: none;
+	border: 1px solid #d63638;
+	color: #d63638;
+	border-radius: 6px;
+	width: 28px;
+	height: 28px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	padding: 0;
+}
+.maf-repeater__toggle svg {
+	width: 16px;
+	height: 16px;
+	transition: transform .2s ease;
+}
+.maf-repeater__row.is-collapsed .maf-grid {
+	display: none;
+}
+.maf-repeater__row.is-collapsed .maf-repeater__toggle svg {
+	transform: rotate(180deg);
+}
+
 
 .maf-repeater__add {
 	background: #f0f6fc;
