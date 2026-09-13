@@ -132,19 +132,15 @@ class MAF_Shortcode {
 		$required    = ! empty( $field['required'] );
 		$condition   = ! empty( $field['condition'] ) ? wp_json_encode( $field['condition'] ) : '';
 		
-		// Width helpers.
-		$width_map = array( 'full' => 100, 'half' => 50, 'third' => 33.3333 );
-		
-		// Resolve base width.
-		$pct     = 100;
-		$width_class = 'maf-field--w-full';
-		if ( ! empty( $field['width_pc'] ) ) {
-			$pct = max( 1, min( 100, (int) $field['width_pc'] ) );
-		} else {
-			$w = isset( $field['width'] ) ? $field['width'] : 'full';
-			$pct = isset( $width_map[ $w ] ) ? $width_map[ $w ] : 100;
+		// Width helpers: 12-column grid system.
+		$col = 12; // Default to full width (12 columns).
+		if ( ! empty( $field['width_cols'] ) ) {
+			$col = max( 1, min( 12, (int) $field['width_cols'] ) );
+		} elseif ( ! empty( $field['width'] ) ) {
+			$w_map = array( 'full' => 12, 'half' => 6, 'third' => 4 );
+			$col = isset( $w_map[ $field['width'] ] ) ? $w_map[ $field['width'] ] : 12;
 		}
-		$width_class = 'maf-field--w-' . ( $pct == 100 ? 'full' : ( $pct == 50 ? 'half' : ( $pct <= 33.3334 ? 'third' : 'custom' ) ) );
+		$width_class = 'maf-col-' . $col;
 		
 		// Responsive widths: output a tiny inline <style> scoped to this field.
 		$responsive_style = '';
@@ -154,7 +150,7 @@ class MAF_Shortcode {
 			$scoped     = '.rf_' . esc_attr( $field_id );
 			
 			// Open style tag with base fallback.
-			$responsive_style = '<style>' . $scoped . '{display:flex;flex-direction:column;gap:6px;width:' . $pct . '%;min-width:0;box-sizing:border-box}';
+			$responsive_style = '<style>' . $scoped . '{--maf-col:' . $col . ';}';
 			
 			$breakpoints = array(
 				array( 'key' => 'mobile',  'min' => 0    ),
@@ -165,21 +161,13 @@ class MAF_Shortcode {
 			foreach ( $breakpoints as $bp ) {
 				if ( isset( $field['widths'][ $bp['key'] ] ) ) {
 					$bw = $field['widths'][ $bp['key'] ];
-					$bp_preset = isset( $bw['preset'] ) && $bw['preset'] && $bw['preset'] !== 'inherit' ? $bw['preset'] : '';
-					$bp_pct    = isset( $bw['pct'] ) && $bw['pct'] ? max( 1, min( 100, (int) $bw['pct'] ) ) : null;
+					$bp_cols = isset( $bw['cols'] ) ? max( 1, min( 12, (int) $bw['cols'] ) ) : null;
 					
-					$bp_value = null;
-					if ( $bp_pct ) {
-						$bp_value = $bp_pct;
-					} elseif ( $bp_preset ) {
-						$bp_value = isset( $width_map[ $bp_preset ] ) ? $width_map[ $bp_preset ] : 100;
-					}
-					
-					if ( null !== $bp_value ) {
+					if ( null !== $bp_cols ) {
 						if ( $bp['min'] > 0 ) {
-							$responsive_style .= '@media(min-width:' . $bp['min'] . 'px){' . $scoped . '{width:' . $bp_value . '%}}';
+							$responsive_style .= '@media(min-width:' . $bp['min'] . 'px){' . $scoped . '{--maf-col:' . $bp_cols . '}}';
 						} else {
-							$responsive_style .= $scoped . '{width:' . $bp_value . '%}';
+							$responsive_style .= $scoped . '{--maf-col:' . $bp_cols . '}';
 						}
 					}
 				}

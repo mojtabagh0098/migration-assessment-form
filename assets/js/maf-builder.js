@@ -1098,53 +1098,29 @@
 				{ key: 'mobile', label: I18N.widthMobile, minW: 0 }
 			];
 			
-			// Ensure widths object exists; merge with legacy width.
+			// Ensure widths object exists.
 			var widths = field.widths || {};
 			breakpoints.forEach( function ( bp ) {
 				if ( ! widths[ bp.key ] ) {
-					widths[ bp.key ] = { preset: '', pct: '' };
+					widths[ bp.key ] = { cols: '' };
 				}
 				var wp = widths[ bp.key ];
 				
 				// Label row for breakpoint.
 				var bw = el( 'div', { class: 'maf-b-rw-breakpoint' } );
 				
-				// Preset dropdown.
-				var presets = [
-					{ val: '', label: I18N.widthInherit },
-					{ val: 'full', label: I18N.widthFull },
-					{ val: 'half', label: I18N.widthHalf },
-					{ val: 'third', label: I18N.widthThird }
-				];
-				var presetSel = el( 'select', { class: 'maf-b-rw-preset small-text', 'data-key': bp.key, title: bp.label + ' — ' + I18N.preset } );
-				presets.forEach( function ( p ) {
-					presetSel.appendChild( el( 'option', { value: p.val, selected: wp.preset === p.val, text: p.label } ) );
-				} );
-				presetSel.addEventListener( 'change', function () {
+				// Column input.
+				var colInput = textInput( wp.cols || '', function ( v ) {
 					update( function ( f ) {
 						if ( ! f.widths ) f.widths = {};
-						if ( ! f.widths[ bp.key ] ) f.widths[ bp.key ] = { preset: '', pct: '' };
-						f.widths[ bp.key ].preset = presetSel.value;
-						if ( presetSel.value === '' ) { delete f.widths[ bp.key ].pct; }
-						// Keep legacy width in sync with desktop preset.
-						if ( bp.key === 'desktop' && presetSel.value ) {
-							f.width = presetSel.value;
-						}
+						if ( ! f.widths[ bp.key ] ) f.widths[ bp.key ] = { cols: '' };
+						v === '' ? delete f.widths[ bp.key ].cols : f.widths[ bp.key ].cols = Math.min( 12, Math.max( 1, parseInt( v, 10 ) ) || '' );
 					}, true );
-				} );
-				
-				// Percentage input.
-				var pctInput = textInput( wp.pct || '', function ( v ) {
-					update( function ( f ) {
-						if ( ! f.widths ) f.widths = {};
-						if ( ! f.widths[ bp.key ] ) f.widths[ bp.key ] = { preset: '', pct: '' };
-						v === '' ? delete f.widths[ bp.key ].pct : f.widths[ bp.key ].pct = Math.min( 100, Math.max( 1, parseInt( v, 10 ) ) || '' );
-					}, true );
-				}, { type: 'number', min: 1, max: 100, class: 'small-text', title: bp.label + ' — %' } );
-				pctInput.style.maxWidth = '80px';
+				}, { type: 'number', min: 1, max: 12, class: 'small-text', title: bp.label + ' — Columns' } );
+				colInput.style.maxWidth = '60px';
 				
 				bw.appendChild( el( 'span', { class: 'maf-b-rw-label', text: bp.label } ) );
-				bw.appendChild( el( 'div', { style: 'display:flex;gap:6px;align-items:center;' }, [ presetSel, el( 'label', { class: 'maf-b-rw-pct-label', text: '%' }, [ pctInput ] ) ] ) );
+				bw.appendChild( el( 'div', { style: 'display:flex;gap:6px;align-items:center;' }, [ el( 'label', { class: 'maf-b-rw-pct-label', text: 'Cols' }, [ colInput ] ) ] ) );
 				rwGroup.appendChild( bw );
 			} );
 			pane.appendChild( rwGroup );
