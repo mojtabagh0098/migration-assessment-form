@@ -999,8 +999,7 @@ class MAF_REST {
 		delete_transient( $transient_key );
 		return (string) $answer === (string) $expected;
 	}
-
-	 */
+	
 	private function get_client_ip() {
 		foreach ( array( 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ) as $key ) {
 			if ( ! empty( $_SERVER[ $key ] ) ) {
