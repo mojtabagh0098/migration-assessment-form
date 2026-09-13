@@ -22,6 +22,7 @@
 	 */
 	function initForm( form ) {
 		initPhoneInputs( form );
+		initSelect2( form );
 		initRepeaters( form );
 		initUploads( form );
 		initConditionalLogic( form );
@@ -29,6 +30,46 @@
 		form.addEventListener( 'submit', function ( e ) {
 			e.preventDefault();
 			submitForm( form );
+		} );
+	}
+
+	/* ------------------------------------------------------------------ */
+	/* Select2 initialization                                              */
+	/* ------------------------------------------------------------------ */
+
+	/**
+	 * Initializes Select2 on every `<select>` element in the given scope
+	 * that has not already been initialized.
+	 * @param {HTMLElement} scope
+	 */
+	function initSelect2( scope ) {
+		if ( typeof jQuery === 'undefined' || typeof jQuery.fn.select2 === 'undefined' ) {
+			return;
+		}
+
+		var $selects = jQuery( scope ).find( 'select' ).not( '.select2-hidden-accessible' );
+		if ( ! $selects.length ) {
+			return;
+		}
+
+		$selects.each( function () {
+			var $el   = jQuery( this );
+			var width = '100%';
+
+			$el.select2( {
+				width:            width,
+				dropdownAutoWidth: false,
+				minimumResultsForSearch: 10,
+				dir:              ( document.documentElement.getAttribute( 'dir' ) || 'ltr' ),
+				dropdownParent:   $el.closest( '.maf-field' ),
+			} );
+
+			// Relay Select2 change to native 'change' event so conditional logic keeps working.
+			$el.on( 'select2:select select2:unselect select2:clear', function () {
+				var evt = document.createEvent( 'HTMLEvents' );
+				evt.initEvent( 'change', true, true );
+				this.dispatchEvent( evt );
+			} );
 		} );
 	}
 
@@ -132,6 +173,10 @@
 							el.checked = false;
 						} else if ( el.type !== 'file' ) {
 							el.value = '';
+							// Sync Select2 when clearing value.
+							if ( el.tagName === 'SELECT' && typeof jQuery !== 'undefined' && jQuery( el ).hasClass( 'select2-hidden-accessible' ) ) {
+								jQuery( el ).val( '' ).trigger( 'change.select2' );
+							}
 						}
 					} else if ( wasHidden && el.dataset.wasRequired ) {
 						el.setAttribute( 'required', '' );
@@ -221,6 +266,7 @@
 
 				rowsContainer.appendChild( clone );
 				initPhoneInputs( rowEl );
+				initSelect2( rowEl );
 				initUploads( rowEl );
 				if ( form.mafEvaluateConditions ) {
 					form.mafEvaluateConditions();
@@ -515,6 +561,10 @@
 					statusEl.textContent = form.dataset.successMessage || MAF_CONFIG.i18n.success;
 					statusEl.classList.add( 'maf-success' );
 					form.reset();
+					// Reset all Select2 instances to their placeholder state.
+					if ( typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined' ) {
+						jQuery( form ).find( 'select.select2-hidden-accessible' ).val( '' ).trigger( 'change.select2' );
+					}
 					form.querySelectorAll( 'input[type="file"]' ).forEach( function ( input ) {
 						input.mafFiles = [];
 						var list = input.closest( '.maf-upload' ).querySelector( '.maf-upload__list' );

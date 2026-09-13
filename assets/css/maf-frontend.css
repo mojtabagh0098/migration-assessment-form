@@ -382,3 +382,94 @@ html[dir="rtl"] .maf-field textarea {
 		transform: translateY(0);
 	}
 }
+
+/* ------------------------------------------------------------------ */
+/* Select2 customization — match form field styles                     */
+/* ------------------------------------------------------------------ */
+
+.maf-field .select2-container--default .select2-selection--single {
+	height: auto;
+	padding: 7px 12px;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	font-size: 14px;
+	transition: border-color 0.15s ease;
+	background-color: #fff;
+}
+
+.maf-field .select2-container--default .select2-selection--single .select2-selection__rendered {
+	color: #1d2327;
+	line-height: 1.6;
+	padding-left: 0;
+	padding-right: 20px;
+}
+
+[dir="rtl"] .maf-field .select2-container--default .select2-selection--single .select2-selection__rendered {
+	padding-right: 0;
+	padding-left: 20px;
+}
+
+.maf-field .select2-container--default .select2-selection--single .select2-selection__placeholder {
+	color: #8c8f94;
+}
+
+.maf-field .select2-container--default .select2-selection--single .select2-selection__arrow {
+	height: 100%;
+	right: 8px;
+}
+
+[dir="rtl"] .maf-field .select2-container--default .select2-selection--single .select2-selection__arrow {
+	right: auto;
+	left: 8px;
+}
+
+.maf-field .select2-container--default.select2-container--open .select2-selection--single,
+.maf-field .select2-container--default.select2-container--focus .select2-selection--single {
+	outline: none;
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+}
+
+.maf-field--error .select2-container--default .select2-selection--single {
+	border-color: #d63638;
+}
+
+/* Dropdown */
+.select2-container--default .select2-dropdown {
+	border-color: #c3c4c7;
+	border-radius: 6px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	z-index: 999999;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+	padding: 8px 10px;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	font-size: 14px;
+	outline: none;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+}
+
+.select2-container--default .select2-results__option {
+	padding: 8px 12px;
+	font-size: 14px;
+}
+
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+	background-color: #2271b1;
+	color: #fff;
+}
+
+.select2-container--default .select2-results__option--selected {
+	background-color: #f0f6fc;
+}
+
+/* Ensure the Select2 container takes full width */
+.maf-field .select2-container {
+	width: 100% !important;
+}
