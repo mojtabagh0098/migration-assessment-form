@@ -323,19 +323,22 @@ class MAF_Shortcode {
 
 			<template class="maf-repeater__template">
 				<div class="maf-repeater__row">
+					<button type="button" class="maf-repeater__remove">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M6.72656 17.2729L17.2725 6.72705" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M17.2725 17.2729L6.72656 6.72705" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+					</button>
 					<div class="maf-grid">
 						<?php foreach ( $section['fields'] as $field ) : ?>
 							<?php $this->render_field( $field, $section['id'] . '[__INDEX__]' ); ?>
 						<?php endforeach; ?>
 					</div>
-					<button type="button" class="maf-repeater__remove">
-						<?php esc_html_e( 'Remove', 'migration-assessment-form' ); ?>
-					</button>
 				</div>
 			</template>
 
 			<button type="button" class="maf-repeater__add">
-				+ <?php echo esc_html( $section['row_label'] ?? __( 'Add row', 'migration-assessment-form' ) ); ?>
+				+
 			</button>
 		</div>
 		<?php
