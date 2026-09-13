@@ -126,6 +126,8 @@ class MAF_Shortcode {
 	 * @param string $prefix Optional name prefix for repeater rows, e.g. "education[0]".
 	 */
 	private function render_field( $field, $prefix = '' ) {
+		error_log( 'MAF Field: ' . print_r( $field, true ) );
+
 		$type        = $field['type'] ?? 'text';
 		$name        = $prefix ? $prefix . '[' . $field['key'] . ']' : $field['key'];
 		$field_id    = ! empty( $field['custom_id'] ) ? $field['custom_id'] : 'maf-field-' . sanitize_html_class( str_replace( array( '[', ']' ), '-', $name ) );
@@ -154,7 +156,7 @@ class MAF_Shortcode {
 			$scoped     = '.rf_' . esc_attr( $field_id );
 			
 			// Open style tag with base fallback.
-			$responsive_style = '<style>' . $scoped . '{display:flex;flex-direction:column;gap:6px;width:' . $pct . '%;min-width:0;box-sizing:border-box}';
+			$responsive_style = '<style>' . $scoped . '{--maf-field-w:' . $pct . '%;}';
 			
 			$breakpoints = array(
 				array( 'key' => 'mobile',  'min' => 0    ),
@@ -177,9 +179,9 @@ class MAF_Shortcode {
 					
 					if ( null !== $bp_value ) {
 						if ( $bp['min'] > 0 ) {
-							$responsive_style .= '@media(min-width:' . $bp['min'] . 'px){' . $scoped . '{width:' . $bp_value . '%}}';
+							$responsive_style .= '@media(min-width:' . $bp['min'] . 'px){' . $scoped . '{--maf-field-w:' . $bp_value . '%}}';
 						} else {
-							$responsive_style .= $scoped . '{width:' . $bp_value . '%}';
+							$responsive_style .= $scoped . '{--maf-field-w:' . $bp_value . '%}';
 						}
 					}
 				}
