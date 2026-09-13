@@ -142,7 +142,6 @@ class MAF_Shortcode {
 			$w_map = array( 'full' => 12, 'half' => 6, 'third' => 4 );
 			$col = isset( $w_map[ $field['width'] ] ) ? $w_map[ $field['width'] ] : 12;
 		}
-		$width_class = 'maf-col-' . $col;
 		
 		// Responsive widths: output a tiny inline <style> scoped to this field.
 		$responsive_style = '';
@@ -181,7 +180,7 @@ class MAF_Shortcode {
 		$wrap_attrs  = $condition ? ' data-condition=\'' . esc_attr( $condition ) . '\' hidden' : '';
 		$wrap_attrs .= ' id="' . esc_attr( $field_id . '-wrap' ) . '"';
 		
-		$classes = 'maf-field maf-field--' . esc_attr( $type ) . ' ' . $width_class;
+		$classes = 'maf-field maf-field--' . esc_attr( $type );
 		if ( $has_widths ) {
 			$classes .= ' maf-field--rw rf_' . esc_attr( $field_id );
 		}
