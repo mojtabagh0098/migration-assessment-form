@@ -441,24 +441,23 @@
 	 * as multipart/form-data: `payload` = JSON of all scalar values, files
 	 * are appended as `file_N` with a `files` JSON map describing where
 	 * each belongs in the payload.
-
+	 * @param {HTMLFormElement} form
+	 */
 	function initCaptcha( form ) {
-		var questionEl = form.querySelector( '#maf-captcha-question' );
-		var keyEl      = form.querySelector( '#maf-captcha-key' );
-		if ( ! questionEl || ! keyEl ) return;
+		var imgEl    = form.querySelector( '#maf-captcha-img' );
+		var keyEl    = form.querySelector( '#maf-captcha-key' );
+		if ( ! imgEl || ! keyEl ) return;
 
 		fetch( MAF_CONFIG.restUrl + 'captcha', {
 			headers: { 'X-WP-Nonce': MAF_CONFIG.nonce }
 		} )
 		.then( function ( res ) { return res.json(); } )
 		.then( function ( data ) {
-			questionEl.textContent = data.question;
+			imgEl.src = data.image; // تنظیم منبع تصویر
 			keyEl.value = data.key;
 		} );
 	}
 
-	 * @param {HTMLFormElement} form
-	 */
 	function submitForm( form ) {
 		if ( ! validate( form ) ) {
 			return;

@@ -974,13 +974,29 @@ class MAF_REST {
 	public function handle_get_captcha() {
 		$a = rand( 1, 10 );
 		$b = rand( 1, 10 );
-		$question = $a . ' + ' . $b . ' = ?';
+		$question = $a . ' + ' . $b; // فقط عبارت
 		$answer   = $a + $b;
 		$key      = wp_hash( $question . time() . rand() );
 		
 		set_transient( 'maf_captcha_' . $key, $answer, HOUR_IN_SECONDS );
+
+		// ایجاد تصویر
+		$im = imagecreatetruecolor(100, 40);
+		$bg = imagecolorallocate($im, 240, 240, 240);
+		$text_color = imagecolorallocate($im, 50, 50, 50);
+		imagefill($im, 0, 0, $bg);
+		// رسم متن روی تصویر
+		imagestring($im, 5, 25, 12, $question, $text_color);
+
+		// تبدیل به Base64
+		ob_start();
+		imagepng($im);
+		$image_data = ob_get_clean();
+		imagedestroy($im);
 		
-		return new WP_REST_Response( array( 'key' => $key, 'question' => $question ), 200 );
+		$base64_image = 'data:image/png;base64,' . base64_encode($image_data);
+		
+		return new WP_REST_Response( array( 'key' => $key, 'image' => $base64_image ), 200 );
 	}
 
 	/**
@@ -999,7 +1015,7 @@ class MAF_REST {
 		delete_transient( $transient_key );
 		return (string) $answer === (string) $expected;
 	}
-	
+
 	private function get_client_ip() {
 		foreach ( array( 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ) as $key ) {
 			if ( ! empty( $_SERVER[ $key ] ) ) {
