@@ -152,11 +152,7 @@ class MAF_Shortcode {
 			$scoped     = '.rf_' . esc_attr( $field_id );
 			
 			// Open style tag with base fallback.
-<<<<<<< HEAD
 			$responsive_style = '<style>' . $scoped . '{--maf-col:' . $col . ';}';
-=======
-			$responsive_style = '<style>' . $scoped . '{--maf-field-w:' . $pct . '%;}';
->>>>>>> 55f91ba510a4b895aa78954d1b5fe5a27a61aed8
 			
 			$breakpoints = array(
 				array( 'key' => 'mobile',  'min' => 0    ),
@@ -171,15 +167,9 @@ class MAF_Shortcode {
 					
 					if ( null !== $bp_cols ) {
 						if ( $bp['min'] > 0 ) {
-<<<<<<< HEAD
 							$responsive_style .= '@media(min-width:' . $bp['min'] . 'px){' . $scoped . '{--maf-col:' . $bp_cols . '}}';
 						} else {
 							$responsive_style .= $scoped . '{--maf-col:' . $bp_cols . '}';
-=======
-							$responsive_style .= '@media(min-width:' . $bp['min'] . 'px){' . $scoped . '{--maf-field-w:' . $bp_value . '%}}';
-						} else {
-							$responsive_style .= $scoped . '{--maf-field-w:' . $bp_value . '%}';
->>>>>>> 55f91ba510a4b895aa78954d1b5fe5a27a61aed8
 						}
 					}
 				}
