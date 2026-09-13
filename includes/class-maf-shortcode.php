@@ -110,6 +110,13 @@ class MAF_Shortcode {
 				</section>
 			<?php endforeach; ?>
 
+
+			<div class="maf-field maf-captcha-field" style="max-width: 300px;">
+				<label for="maf-captcha-ans"><?php esc_html_e( 'Please solve this equation:', 'migration-assessment-form' ); ?> <span id="maf-captcha-question">...</span></label>
+				<input type="text" id="maf-captcha-ans" name="captcha_answer" autocomplete="off" required />
+				<input type="hidden" id="maf-captcha-key" name="captcha_key" />
+			</div>
+
 			<div class="maf-submit-row">
 				<button type="submit" class="maf-submit-btn"><?php esc_html_e( 'Send Application', 'migration-assessment-form' ); ?></button>
 				<span class="maf-submit-status" role="status" aria-live="polite"></span>

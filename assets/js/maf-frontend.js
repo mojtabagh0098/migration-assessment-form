@@ -25,6 +25,7 @@
 		initRepeaters( form );
 		initUploads( form );
 		initConditionalLogic( form );
+		initCaptcha( form );
 		form.addEventListener( 'submit', function ( e ) {
 			e.preventDefault();
 			submitForm( form );
@@ -440,6 +441,22 @@
 	 * as multipart/form-data: `payload` = JSON of all scalar values, files
 	 * are appended as `file_N` with a `files` JSON map describing where
 	 * each belongs in the payload.
+
+	function initCaptcha( form ) {
+		var questionEl = form.querySelector( '#maf-captcha-question' );
+		var keyEl      = form.querySelector( '#maf-captcha-key' );
+		if ( ! questionEl || ! keyEl ) return;
+
+		fetch( MAF_CONFIG.restUrl + 'captcha', {
+			headers: { 'X-WP-Nonce': MAF_CONFIG.nonce }
+		} )
+		.then( function ( res ) { return res.json(); } )
+		.then( function ( data ) {
+			questionEl.textContent = data.question;
+			keyEl.value = data.key;
+		} );
+	}
+
 	 * @param {HTMLFormElement} form
 	 */
 	function submitForm( form ) {

@@ -243,6 +243,16 @@ class MAF_REST {
 
 		register_rest_route(
 			self::NAMESPACE_URI,
+			'/captcha',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'handle_get_captcha' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_URI,
 			'/submit',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -361,6 +371,15 @@ class MAF_REST {
 				$payload = $body;
 			}
 		}
+
+		// Captcha Verification
+		$captcha_key = $payload['captcha_key'] ?? '';
+		$captcha_answer = $payload['captcha_answer'] ?? '';
+		if ( ! $this->verify_captcha( $captcha_key, $captcha_answer ) ) {
+			return new WP_Error( 'maf_captcha_failed', __( 'Invalid captcha. Please try again.', 'migration-assessment-form' ), array( 'status' => 403 ) );
+		}
+		unset( $payload['captcha_key'], $payload['captcha_answer'] );
+
 
 		// Process uploads first so file values participate in validation like any other value.
 		$file_errors = array();
@@ -946,6 +965,41 @@ class MAF_REST {
 	 * Best-effort client IP resolution (kept out of user-editable input).
 	 *
 	 * @return string
+
+	/**
+	 * Generates a math captcha challenge.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function handle_get_captcha() {
+		$a = rand( 1, 10 );
+		$b = rand( 1, 10 );
+		$question = $a . ' + ' . $b . ' = ?';
+		$answer   = $a + $b;
+		$key      = wp_hash( $question . time() . rand() );
+		
+		set_transient( 'maf_captcha_' . $key, $answer, HOUR_IN_SECONDS );
+		
+		return new WP_REST_Response( array( 'key' => $key, 'question' => $question ), 200 );
+	}
+
+	/**
+	 * Verifies a captcha answer.
+	 *
+	 * @param string $key    Captcha key.
+	 * @param string $answer Submitted answer.
+	 * @return bool
+	 */
+	private function verify_captcha( $key, $answer ) {
+		$transient_key = 'maf_captcha_' . $key;
+		$expected = get_transient( $transient_key );
+		if ( false === $expected ) {
+			return false;
+		}
+		delete_transient( $transient_key );
+		return (string) $answer === (string) $expected;
+	}
+
 	 */
 	private function get_client_ip() {
 		foreach ( array( 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ) as $key ) {
