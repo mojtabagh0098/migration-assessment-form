@@ -596,19 +596,9 @@ class MAF_Fields {
 						$cf[ $str_key ] = sanitize_text_field( $field[ $str_key ] );
 					}
 				}
-				// Width Sanitization
-				$legacy_width = isset( $field['width'] ) && in_array( (string) $field['width'], array( 'full', 'half', 'third' ), true ) ? (string) $field['width'] : 'full';
-				$cf['width']  = isset( $field['width_desktop'] ) && in_array( (string) $field['width_desktop'], array( 'full', 'half', 'third' ), true ) ? (string) $field['width_desktop'] : $legacy_width;
-				$cf['width_desktop'] = $cf['width'];
-
-				foreach ( array( 'width_laptop', 'width_tablet', 'width_mobile' ) as $device_width ) {
-					if ( isset( $field[ $device_width ] ) && in_array( (string) $field[ $device_width ], array( 'full', 'half', 'third' ), true ) ) {
-						$cf[ $device_width ] = (string) $field[ $device_width ];
-					}
-				}
-
-				if ( ! empty( $field['width_pc'] ) ) {
-					$cf['width_pc'] = max( 1, min( 100, (int) $field['width_pc'] ) );
+				// Width Sanitization: 12-column grid system
+				if ( ! empty( $field['width_cols'] ) ) {
+					$cf['width_cols'] = max( 1, min( 12, (int) $field['width_cols'] ) );
 				}
 
 				foreach ( array( 'min', 'max', 'step' ) as $num_key ) {
@@ -631,9 +621,8 @@ class MAF_Fields {
 					$cf['custom_class'] = sanitize_text_field( $field['custom_class'] );
 				}
 
-				// Responsive widths (per-breakpoint object: { desktop: {preset,pct}, laptop: … }).
+				// Responsive widths (per-breakpoint object: { desktop: {cols: 4}, laptop: … }).
 				if ( ! empty( $field['widths'] ) && is_array( $field['widths'] ) ) {
-					$valid_presets  = array( '', 'full', 'half', 'third', 'inherit' );
 					$valid_bp_keys = array( 'desktop', 'laptop', 'tablet', 'mobile' );
 					$clean_widths  = array();
 					foreach ( $field['widths'] as $bp_key => $bp_val ) {
@@ -641,11 +630,8 @@ class MAF_Fields {
 							continue;
 						}
 						$entry = array();
-						if ( isset( $bp_val['preset'] ) && in_array( (string) $bp_val['preset'], $valid_presets, true ) ) {
-							$entry['preset'] = (string) $bp_val['preset'];
-						}
-						if ( ! empty( $bp_val['pct'] ) ) {
-							$entry['pct'] = max( 1, min( 100, (int) $bp_val['pct'] ) );
+						if ( ! empty( $bp_val['cols'] ) ) {
+							$entry['cols'] = max( 1, min( 12, (int) $bp_val['cols'] ) );
 						}
 						if ( ! empty( $entry ) ) {
 							$clean_widths[ $bp_key ] = $entry;
