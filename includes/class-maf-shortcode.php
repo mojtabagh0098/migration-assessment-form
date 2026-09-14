@@ -118,7 +118,7 @@ class MAF_Shortcode {
 
 
 			<div class="maf-field maf-captcha-field" style="max-width: 300px;">
-				<label for="maf-captcha-ans"><?php esc_html_e( 'Please solve the equation in the image:', 'migration-assessment-form' ); ?></label>
+				<label for="maf-captcha-ans"><?php esc_html_e( 'CAPTCHA', 'migration-assessment-form' ); ?></label>
 				<img id="maf-captcha-img" src="" alt="Captcha" style="display:block; margin-bottom:10px; border:1px solid #ccc;" />
 				<input type="text" id="maf-captcha-ans" name="captcha_answer" autocomplete="off" required />
 				<input type="hidden" id="maf-captcha-key" name="captcha_key" />

@@ -124,21 +124,26 @@
 	height: 16px;
 }
 .maf-repeater__toggle {
-	background: none;
-	border: 1px solid #d63638;
-	color: #d63638;
-	border-radius: 6px;
-	width: 28px;
-	height: 28px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	padding: 0;
+	background: #ebebeb;
+    border: 0;
+    color: #6A6A6A;
+    border-radius: 6px;
+    width: 44px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 16px;
+}
+.maf-repeater__toggle:hover, .maf-repeater__toggle:focus {
+	background: #ebebeb;
+	color: #6A6A6A;
 }
 .maf-repeater__toggle svg {
-	width: 16px;
-	height: 16px;
+	width: 20px;
+	height: 20px;
 	transition: transform .2s ease;
 }
 .maf-repeater__row.is-collapsed .maf-grid {
@@ -228,9 +233,11 @@ html[dir="rtl"] .maf-field textarea {
 }
 
 .maf-card__desc {
-	margin: -8px 0 16px;
-	color: #50575e;
-	font-size: 14px;
+	margin: 50px 0 30px;
+    color: #212121;
+    font-size: 20px;
+    font-weight: 500;
+    font-family: "Poppins" !important;
 }
 
 .maf-field__help {
@@ -388,13 +395,18 @@ html[dir="rtl"] .maf-field textarea {
 /* ------------------------------------------------------------------ */
 
 .maf-field .select2-container--default .select2-selection--single {
-	height: auto;
-	padding: 7px 12px;
-	border: 1px solid #c3c4c7;
-	border-radius: 6px;
-	font-size: 14px;
-	transition: border-color 0.15s ease;
-	background-color: #fff;
+	height: 48px;
+    padding: 8px 16px;
+    border: 1px solid #D1D1D1 !important;
+    border-radius: 12px;
+    font-size: 14px;
+    transition: border-color 0.15s ease;
+    background-color: #fff;
+    box-shadow: none;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    font-family: "Poppins" !important;
 }
 
 .maf-field .select2-container--default .select2-selection--single .select2-selection__rendered {
@@ -426,8 +438,7 @@ html[dir="rtl"] .maf-field textarea {
 .maf-field .select2-container--default.select2-container--open .select2-selection--single,
 .maf-field .select2-container--default.select2-container--focus .select2-selection--single {
 	outline: none;
-	border-color: #2271b1;
-	box-shadow: 0 0 0 1px #2271b1;
+	border-color: #D1D1D1;
 }
 
 .maf-field--error .select2-container--default .select2-selection--single {
@@ -440,6 +451,9 @@ html[dir="rtl"] .maf-field textarea {
 	border-radius: 6px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	z-index: 999999;
+	border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    margin-top: -1px;
 }
 
 .select2-container--default .select2-search--dropdown .select2-search__field {
@@ -472,4 +486,8 @@ html[dir="rtl"] .maf-field textarea {
 /* Ensure the Select2 container takes full width */
 .maf-field .select2-container {
 	width: 100% !important;
+}
+
+.maf-captcha-field {
+	max-width: 50%;
 }

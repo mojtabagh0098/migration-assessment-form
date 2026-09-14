@@ -393,9 +393,9 @@ html[dir="rtl"] .maf-b-toggle input:checked + .maf-b-toggle__track::after { tran
 
 /* Options editor */
 .maf-b-options { display: flex; flex-direction: column; gap: 6px; }
-.maf-b-option { display: grid; grid-template-columns: 18px 1fr 1fr 28px; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--mafb-border); border-radius: 6px; padding: 4px 6px; }
+.maf-b-option { display: grid; grid-template-columns: 24px 1fr 1fr 24px; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--mafb-border); border-radius: 6px; padding: 4px 6px; }
 .maf-b-option.is-over { border-color: var(--mafb-primary); box-shadow: 0 -2px 0 var(--mafb-primary); }
-.maf-b-option input { min-width: 0; border-radius: 4px; border-color: #dcdcde; font-size: 12px; padding: 2px 6px; min-height: 26px; }
+.maf-b-option input { min-width: 0; border-radius: 4px; border-color: #dcdcde; font-size: 12px; padding: 2px 6px; min-height: 26px; width: 9em; }
 .maf-b-option input.code { font-family: Consolas, Monaco, monospace; color: var(--mafb-muted); }
 .maf-b-options__actions { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
 .maf-b-group textarea { width: 100%; margin-top: 8px; }
