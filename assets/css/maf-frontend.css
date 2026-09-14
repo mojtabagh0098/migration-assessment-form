@@ -453,7 +453,7 @@ html[dir="rtl"] .maf-field textarea {
 	z-index: 999999;
 	border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important;
-    margin-top: -1px;
+    margin-top: 2px;
 }
 
 .select2-container--default .select2-search--dropdown .select2-search__field {

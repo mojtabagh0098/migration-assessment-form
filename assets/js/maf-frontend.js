@@ -61,7 +61,6 @@
 				dropdownAutoWidth: false,
 				minimumResultsForSearch: 10,
 				dir:              ( document.documentElement.getAttribute( 'dir' ) || 'ltr' ),
-				dropdownParent:   $el.closest( '.maf-field' ),
 			} );
 
 			// Relay Select2 change to native 'change' event so conditional logic keeps working.
