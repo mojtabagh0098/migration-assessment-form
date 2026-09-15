@@ -77,6 +77,27 @@ class MAF_Shortcode {
 		$atts = shortcode_atts( array( 'id' => 0 ), $atts, 'assessment_form' );
 		$form_id = (int) $atts['id'];
 
+		// Translate form ID to the current WPML language if WPML is active.
+		if ( $form_id && function_exists( 'apply_filters' ) ) {
+			$current_lang = MAF_WPML::current_language();
+			if ( $current_lang ) {
+				$translated_id = apply_filters( 'wpml_object_id', $form_id, MAF_CPT::POST_TYPE, true, $current_lang );
+				if ( $translated_id ) {
+					$form_id = (int) $translated_id;
+				}
+			}
+		}'apply_filters' ) ) {
+			$current_lang = MAF_WPML::current_language();
+			if ( $current_lang ) {
+				$translated_id = apply_filters( 'wpml_object_id', $form_id, MAF_CPT::POST_TYPE, true, $current_lang );
+				if ( $translated_id ) {
+					$form_id = (int) $translated_id;
+				}
+			}
+		}
+
+
+
 		if ( ! $form_id || get_post_type( $form_id ) !== MAF_CPT::POST_TYPE ) {
 			return '<p class="maf-error">' . esc_html__( 'Invalid assessment form ID.', 'migration-assessment-form' ) . '</p>';
 		}
